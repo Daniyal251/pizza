@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Пиццерия You Печка | Доставка и самовывоз</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { orange: '#C68663', dark: '#1C1917', light: '#FDFBF7' }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        html { scroll-behavior: smooth; }
+        body { background-color: #FDFBF7; }
+        .no-scroll { overflow: hidden; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 4px; }
+    </style>
+</head>
+<body class="text-stone-800 antialiased selection:bg-orange-200">
+
+    <!-- Header -->
+    <header id="navbar" class="fixed top-0 w-full z-40 transition-all duration-300 py-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+            <a href="#" class="flex items-center space-x-3 group">
+                <div class="relative w-12 h-12 sm:w-14 sm:h-14 bg-[#C68663] rounded-full flex items-center justify-center border-2 border-stone-800 shadow-sm transition-transform group-hover:scale-105">
+                    <i data-lucide="pizza" class="w-7 h-7 sm:w-8 sm:h-8 text-white"></i>
+                </div>
+                <div class="flex flex-col">
+                    <span class="font-serif italic text-2xl sm:text-3xl text-stone-800 leading-none -mb-1">You</span>
+                    <span class="font-black text-xl sm:text-2xl tracking-widest text-stone-800 leading-none uppercase">ПЕЧКА</span>
+                </div>
+            </a>
+            <nav class="hidden md:flex items-center space-x-8 font-medium text-stone-600">
+                <a href="#menu" class="hover:text-orange-600 transition-colors">Меню</a>
+                <a href="#contacts" class="hover:text-orange-600 transition-colors">Контакты</a>
+            </nav>
+            <div class="flex items-center space-x-4">
+                <a href="tel:+79297252455" class="hidden sm:flex items-center font-bold text-stone-700 hover:text-orange-600 transition-colors">
+                    8 (929) 725-24-55
+                </a>
+                <button onclick="toggleCart()" class="relative flex items-center justify-center w-12 h-12 rounded-full bg-stone-900 text-white hover:bg-orange-600 transition-colors shadow-lg">
+                    <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                    <span id="cart-badge" class="hidden absolute -top-1 -right-1 w-5 h-5 bg-orange-500 text-white text-xs font-bold rounded-full flex items-center justify-center border-2 border-white">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
+        <div class="absolute inset-0 z-0">
+            <div class="absolute inset-0 bg-gradient-to-r from-[#FDFBF7] via-[#FDFBF7]/80 to-transparent z-10"></div>
+            <img src="https://images.unsplash.com/photo-1590947132387-155cc02f3212?w=1600&q=80" alt="Pizza" class="w-full h-full object-cover opacity-90">
+        </div>
+        <div class="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="max-w-2xl">
+                <div class="inline-flex items-center bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full text-stone-800 font-bold text-sm mb-6 shadow-sm border border-stone-200">
+                    <i data-lucide="flame" class="w-4 h-4 text-orange-500 mr-2"></i>
+                    Готовим с любовью
+                </div>
+                <h1 class="text-5xl md:text-7xl font-black text-stone-900 leading-tight mb-6">
+                    Горячая пицца <br/><span class="text-orange-600">прямо из печи</span>
+                </h1>
+                <p class="text-xl text-stone-600 mb-8 max-w-lg">
+                    Оформляйте заказ прямо на сайте. Забирайте горячую пиццу самовывозом по адресу ул. Ярышлар, 2Б.
+                </p>
+                <a href="#menu" class="inline-flex items-center justify-center px-8 py-4 bg-stone-900 text-white font-bold rounded-full hover:bg-orange-600 transition-all shadow-xl hover:-translate-y-1">
+                    Выбрать пиццу
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Menu -->
+    <section id="menu" class="py-20 bg-[#FDFBF7]">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-black text-stone-900 mb-4 uppercase tracking-tight">Наше Меню</h2>
+                <div class="w-24 h-1.5 bg-orange-500 mx-auto rounded-full"></div>
+            </div>
+            <div id="menu-container" class="space-y-16"></div>
+        </div>
+    </section>
+
+    <!-- Contacts & Map -->
+    <section id="contacts" class="py-20 bg-stone-900 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h2 class="text-3xl font-black mb-8 uppercase">Ждем вас в гости</h2>
+                    <div class="space-y-6">
+                        <div class="flex items-start">
+                            <div class="w-12 h-12 rounded-2xl bg-stone-800 flex items-center justify-center flex-shrink-0 mr-4">
+                                <i data-lucide="map-pin" class="w-6 h-6 text-orange-500"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg">Адрес</h4>
+                                <p class="text-stone-400">с. Усады, ул. Ярышлар, 2Б</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="w-12 h-12 rounded-2xl bg-stone-800 flex items-center justify-center flex-shrink-0 mr-4">
+                                <i data-lucide="clock" class="w-6 h-6 text-orange-500"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg">Режим работы</h4>
+                                <p class="text-stone-400">Ежедневно 10:00 – 21:00</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Обновленная карта с указанием точно на организацию -->
+                <div class="h-[400px] w-full bg-stone-200 rounded-3xl overflow-hidden relative border border-stone-700 shadow-lg">
+                    <iframe 
+                        src="https://yandex.ru/map-widget/v1/?ll=49.199541%2C55.680483&z=17&pt=49.199541,55.680483,pm2rdm" 
+                        width="100%" 
+                        height="100%" 
+                        frameborder="0" 
+                        allowfullscreen="true">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-stone-950 text-stone-500 py-8 text-center text-sm">
+        © <span id="year"></span> You ПЕЧКА. Все права защищены.
+    </footer>
+
+    <!-- Cart Sidebar -->
+    <div id="cart-overlay" onclick="toggleCart()" class="fixed inset-0 z-[60] bg-stone-900/60 backdrop-blur-sm hidden transition-opacity opacity-0"></div>
+    <div id="cart-sidebar" class="fixed inset-y-0 right-0 z-[61] w-full max-w-md bg-white shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col">
+        <div class="p-6 border-b border-stone-100 flex items-center justify-between bg-stone-50">
+            <h2 class="text-xl font-black flex items-center"><i data-lucide="shopping-bag" class="w-5 h-5 mr-2"></i>Корзина</h2>
+            <button onclick="toggleCart()" class="p-2 hover:bg-stone-200 rounded-full"><i data-lucide="x" class="w-6 h-6"></i></button>
+        </div>
+        <div id="cart-items" class="flex-grow overflow-y-auto p-6 space-y-6"></div>
+        <div id="cart-footer" class="hidden p-6 border-t border-stone-100 bg-stone-50">
+            <div class="flex justify-between items-center mb-6">
+                <span class="text-stone-500 font-medium">Итого:</span>
+                <span id="cart-total" class="text-2xl font-black text-stone-900">0 ₽</span>
+            </div>
+            <button onclick="openCheckoutModal()" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-bold py-4 rounded-xl shadow-lg transition-colors flex justify-center items-center">
+                Перейти к оформлению
+            </button>
+        </div>
+    </div>
+
+    <!-- Checkout Modal -->
+    <div id="checkout-modal" class="fixed inset-0 z-[70] bg-stone-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl w-full max-w-md shadow-2xl flex flex-col overflow-hidden">
+            <div class="p-6 border-b border-stone-100 flex justify-between items-center bg-stone-50">
+                <h3 class="text-xl font-bold text-stone-800">Оформление заказа</h3>
+                <button onclick="closeCheckoutModal()" class="text-stone-400 hover:text-stone-700"><i data-lucide="x" class="w-6 h-6"></i></button>
+            </div>
+            <form onsubmit="submitOrder(event)" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-stone-700 mb-1">Ваше имя</label>
+                    <input type="text" id="order-name" required class="w-full px-4 py-3 border border-stone-200 rounded-xl focus:ring-2 focus:ring-orange-500 outline-none" placeholder="Иван">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-stone-700 mb-1">Телефон</label>
+                    <input type="tel" id="order-phone" required class="w-full px-4 py-3 border border-stone-200 rounded-xl focus:ring-2 focus:ring-orange-500 outline-none" placeholder="+7 (999) 000-00-00">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-stone-700 mb-1">Способ получения</label>
+                    <div class="w-full px-4 py-3 border border-stone-200 rounded-xl bg-stone-50 text-stone-600 font-medium flex items-center">
+                        <i data-lucide="map-pin" class="w-5 h-5 mr-2 text-orange-500"></i>
+                        Только самовывоз (ул. Ярышлар, 2Б)
+                    </div>
+                </div>
+                <button id="submit-btn" type="submit" class="w-full mt-4 bg-stone-900 hover:bg-stone-800 text-white font-bold py-4 rounded-xl flex items-center justify-center transition-colors">
+                    <i data-lucide="send" class="w-5 h-5 mr-2"></i> Отправить заказ
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="success-modal" class="fixed inset-0 z-[80] bg-stone-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl w-full max-w-sm shadow-2xl p-8 text-center">
+            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i data-lucide="check" class="w-8 h-8 text-green-500"></i>
+            </div>
+            <h3 class="text-2xl font-bold text-stone-800 mb-2">Заказ принят!</h3>
+            <p class="text-stone-500 mb-6">Мы уже начали готовить вашу пиццу. Скоро свяжемся с вами.</p>
+            <button onclick="closeSuccessModal()" class="w-full bg-stone-900 text-white font-bold py-3 rounded-xl">Отлично</button>
+        </div>
+    </div>
+
+    <script>
+        // В реальном проекте эти данные будут загружаться из базы данных
+        // Сейчас я оставил базовое меню
+        let menuItems = [
+            { id: 1, category: 'Пицца', name: 'Пепперони', price: 550, size: '30 см', desc: 'Тонкое тесто, сливочный/томатный соус, сыр моцарелла, пепперони', tags: [], img: 'https://images.unsplash.com/photo-1628840042765-356cda07504e?w=500&q=80' },
+            { id: 2, category: 'Пицца', name: 'Мясная', price: 650, size: '30 см', desc: 'Тонкое тесто, томатный соус, сыр моцарелла, ветчина, пепперони, куриная грудка, охотничьи колбаски, маслины', tags: ['Много мяса!'], img: 'https://images.unsplash.com/photo-1604381538336-254bc79a9f49?w=500&q=80' },
+            { id: 3, category: 'Пицца', name: 'Курица грибы', price: 550, size: '30 см', desc: 'Тонкое тесто, томатный соус, сыр моцарелла, куриное филе, шампиньоны', tags: [], img: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=500&q=80' },
+            { id: 4, category: 'Пицца', name: 'С креветками', price: 600, size: '30 см', desc: 'Тонкое тесто, сливочный соус, сыр моцарелла, королевские креветки, томаты, базилик', tags: [], img: 'https://images.unsplash.com/photo-1516697073-419b2bd079db?w=500&q=80' },
+            { id: 5, category: 'Пицца', name: 'Сливочная', price: 600, size: '30 см', desc: 'Тонкое тесто, сливочный соус, сыр моцарелла, ветчина, красный лук, шампиньоны', tags: ['New!'], img: 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=500&q=80' },
+            { id: 6, category: 'Пицца', name: 'Диабло', price: 650, size: '30 см', desc: 'Тонкое тесто, томатный соус, сыр моцарелла, ветчина, пепперони, куриная грудка, охотничьи колбаски, красный лук, перец халапеньо', tags: ['🌶️ Острая'], img: 'https://images.unsplash.com/photo-1528137871618-79d2761e3fd5?w=500&q=80' },
+            { id: 7, category: 'Пицца', name: 'Песто', price: 550, size: '30 см', desc: 'Тонкое тесто, томатный соус, сыр моцарелла, ветчина, томаты, соус песто', tags: [], img: 'https://images.unsplash.com/photo-1573225342350-16731dd9be38?w=500&q=80' },
+            { id: 8, category: 'Пицца', name: 'Цезарь', price: 600, size: '30 см', desc: 'Тонкое тесто, сливочный соус, сыр моцарелла, куриное филе, салат Айсберг, томаты черри', tags: ['Моя любимая!'], img: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=500&q=80' },
+            { id: 9, category: 'Пицца', name: 'Курица с ананасами', price: 550, size: '30 см', desc: 'Тонкое тесто, сливочный соус, сыр моцарелла, куриное филе, ананасы', tags: [], img: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=500&q=80' },
+            { id: 10, category: 'Пицца', name: 'Четыре вкуса', price: 770, size: '33 см', desc: 'Тонкое тесто, сливочный соус, сыр моцарелла, пепперони, курица-грибы, 4 сыра, ветчина', tags: ['Большая!'], img: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=500&q=80' },
+            { id: 11, category: 'Пицца', name: 'Четыре сыра', price: 550, size: '30 см', desc: 'Тонкое тесто, сливочный соус, сыр моцарелла, чеддер, дорблю, пармезан', tags: ['🌱'], img: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=500&q=80' },
+            { id: 12, category: 'Пицца', name: 'Грибная', price: 500, size: '30 см', desc: 'Тонкое тесто, сливочный соус, сыр моцарелла, шампиньоны, орегано', tags: ['🌱'], img: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=500&q=80' },
+            { id: 13, category: 'Пицца', name: 'Овощи грибы', price: 550, size: '30 см', desc: 'Тонкое тесто, томатный соус, сыр моцарелла, шампиньоны, томаты, сладкий перец, красный лук', tags: ['🌱'], img: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=500&q=80' },
+            { id: 14, category: 'Пицца', name: 'С грушей и горгонзолой', price: 550, size: '30 см', desc: 'Тонкое тесто, сливочный соус, сыр моцарелла, груша, сыр горгонзола', tags: [], img: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=500&q=80' },
+            { id: 15, category: 'Пицца', name: 'Маргарита', price: 500, size: '30 см', desc: 'Тонкое тесто, томатный соус, сыр моцарелла, томаты, базилик', tags: ['🌱'], img: 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=500&q=80' },
+            { id: 16, category: 'Пицца', name: 'Бургер', price: 650, size: '30 см', desc: 'Тонкое тесто, томатный соус, сыр моцарелла, бекон, курица, красный лук, соленые огурчики, соус бургер', tags: ['New!'], img: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500&q=80' },
+            { id: 17, category: 'Пицца', name: 'Пикантная', price: 650, size: '30 см', desc: 'Тонкое тесто, томатный соус, сыр моцарелла, ветчина, пепперони, бекон, шампиньоны, соус барбекю', tags: ['Попробуйте!'], img: 'https://images.unsplash.com/photo-1628840042765-356cda07504e?w=500&q=80' },
+            { id: 18, category: 'Пицца', name: 'Барбекю', price: 650, size: '30 см', desc: 'Тонкое тесто, томатный соус, сыр моцарелла, куриное филе, томаты, красный лук, соус барбекю', tags: [], img: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=500&q=80' },
+            { id: 19, category: 'Пицца', name: 'С беконом', price: 650, size: '30 см', desc: 'Тонкое тесто, томатный соус, сыр моцарелла, бекон, томаты, красный лук, соус барбекю', tags: ['🌶️ Острая'], img: 'https://images.unsplash.com/photo-1628840042765-356cda07504e?w=500&q=80' },
+            { id: 20, category: 'Пицца', name: 'С охотничьими колбасками', price: 550, size: '30 см', desc: 'Тонкое тесто, томатный соус, сыр моцарелла, охотничьи колбаски', tags: [], img: 'https://images.unsplash.com/photo-1628840042765-356cda07504e?w=500&q=80' },
+            
+            // Дополнения
+            { id: 101, category: 'Дополни пиццу', name: 'Сыр', price: 50, size: 'Добавка', desc: '', tags: [], img: 'https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?w=500&q=80' },
+            { id: 102, category: 'Дополни пиццу', name: 'Лук / перец / томаты / грибы', price: 30, size: 'Добавка', desc: '', tags: [], img: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=500&q=80' },
+            { id: 103, category: 'Дополни пиццу', name: 'Ветчина / пепперони / курица', price: 50, size: 'Добавка', desc: '', tags: [], img: 'https://images.unsplash.com/photo-1615937657715-bc7b4b7962c1?w=500&q=80' }
+        ];
+        
+        let cart = [];
+        let isCartOpen = false;
+
+        // НАСТРОЙКИ TELEGRAM БОТА (В реальном проекте загружаются из БД/Админки)
+        // Замените эти значения на свои!
+        const BOT_TOKEN = 'YOUR_TELEGRAM_BOT_TOKEN_HERE';
+        const CHAT_ID = 'YOUR_TELEGRAM_CHAT_ID_HERE';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            document.getElementById('year').textContent = new Date().getFullYear();
+            renderMenu();
+        });
+
+        function renderMenu() {
+            const container = document.getElementById('menu-container');
+            const categories = [...new Set(menuItems.map(i => i.category))];
+            
+            categories.forEach(cat => {
+                const items = menuItems.filter(i => i.category === cat);
+                let html = `<div class="mb-12"><h3 class="text-2xl font-bold mb-6 flex items-center"><span class="w-3 h-8 bg-orange-500 rounded-full mr-4"></span>${cat}</h3><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">`;
+                
+                items.forEach(item => {
+                    html += `
+                        <div class="bg-white rounded-3xl p-4 shadow-sm hover:shadow-xl transition-all border border-stone-100 flex flex-col">
+                            <div class="relative h-56 mb-4 overflow-hidden rounded-2xl bg-stone-100">
+                                <img src="${item.img}" class="w-full h-full object-cover">
+                            </div>
+                            <div class="flex justify-between items-start mb-2">
+                                <h4 class="text-xl font-bold">${item.name}</h4>
+                                <span class="text-lg font-black text-orange-600 whitespace-nowrap">${item.price} ₽</span>
+                            </div>
+                            <p class="text-stone-500 text-sm mb-4 flex-grow">${item.desc}</p>
+                            <div class="pt-4 border-t border-stone-50 flex items-center justify-between">
+                                <span class="text-xs font-medium text-stone-400 uppercase">${item.size}</span>
+                                <button onclick="addToCart(${item.id})" class="w-10 h-10 rounded-full bg-stone-100 hover:bg-stone-900 hover:text-white flex items-center justify-center transition-colors">
+                                    <i data-lucide="plus" class="w-5 h-5"></i>
+                                </button>
+                            </div>
+                        </div>`;
+                });
+                html += `</div></div>`;
+                container.innerHTML += html;
+            });
+            lucide.createIcons();
+        }
+
+        // --- Cart Functions ---
+        function toggleCart() {
+            const overlay = document.getElementById('cart-overlay');
+            const sidebar = document.getElementById('cart-sidebar');
+            isCartOpen = !isCartOpen;
+            
+            if (isCartOpen) {
+                document.body.classList.add('no-scroll');
+                overlay.classList.remove('hidden');
+                setTimeout(() => { overlay.classList.remove('opacity-0'); sidebar.classList.remove('translate-x-full'); }, 10);
+            } else {
+                document.body.classList.remove('no-scroll');
+                overlay.classList.add('opacity-0'); sidebar.classList.add('translate-x-full');
+                setTimeout(() => { overlay.classList.add('hidden'); }, 300);
+            }
+        }
+
+        function addToCart(id) {
+            const item = menuItems.find(i => i.id === id);
+            const existing = cart.find(i => i.id === id);
+            if (existing) existing.qty++; else cart.push({ ...item, qty: 1 });
+            updateCartUI();
+            if (!isCartOpen) toggleCart();
+        }
+
+        function updateQty(id, delta) {
+            const item = cart.find(i => i.id === id);
+            if (!item) return;
+            item.qty += delta;
+            if (item.qty <= 0) cart = cart.filter(i => i.id !== id);
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const container = document.getElementById('cart-items');
+            const footer = document.getElementById('cart-footer');
+            const badge = document.getElementById('cart-badge');
+            
+            const count = cart.reduce((sum, i) => sum + i.qty, 0);
+            const total = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
+            
+            badge.textContent = count;
+            badge.classList.toggle('hidden', count === 0);
+            document.getElementById('cart-total').textContent = `${total} ₽`;
+
+            if (count === 0) {
+                footer.classList.add('hidden');
+                container.innerHTML = `<div class="h-full flex flex-col items-center justify-center text-stone-400"><i data-lucide="shopping-bag" class="w-16 h-16 opacity-20 mb-4"></i><p>Корзина пуста</p></div>`;
+            } else {
+                footer.classList.remove('hidden');
+                container.innerHTML = cart.map(item => `
+                    <div class="flex gap-4">
+                        <img src="${item.img}" class="w-16 h-16 rounded-xl object-cover">
+                        <div class="flex-grow">
+                            <div class="flex justify-between"><h4 class="font-bold">${item.name}</h4><span class="font-bold">${item.price * item.qty}₽</span></div>
+                            <div class="flex items-center mt-2 space-x-3">
+                                <button onclick="updateQty(${item.id}, -1)" class="w-6 h-6 bg-stone-100 rounded-full flex items-center justify-center">-</button>
+                                <span class="font-bold text-sm">${item.qty}</span>
+                                <button onclick="updateQty(${item.id}, 1)" class="w-6 h-6 bg-stone-100 rounded-full flex items-center justify-center">+</button>
+                            </div>
+                        </div>
+                    </div>`).join('');
+            }
+            lucide.createIcons();
+        }
+
+        // --- Checkout Flow (Telegram Integration) ---
+        function openCheckoutModal() {
+            toggleCart();
+            document.getElementById('checkout-modal').classList.remove('hidden');
+        }
+        function closeCheckoutModal() {
+            document.getElementById('checkout-modal').classList.add('hidden');
+        }
+        
+        async function submitOrder(e) {
+            e.preventDefault();
+            const btn = document.getElementById('submit-btn');
+            btn.disabled = true;
+            btn.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 mr-2 animate-spin"></i> Отправка...`;
+            lucide.createIcons();
+
+            const name = document.getElementById('order-name').value;
+            const phone = document.getElementById('order-phone').value;
+            const total = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
+
+            let message = `🍕 <b>НОВЫЙ ЗАКАЗ</b>\n\n`;
+            message += `👤 <b>Имя:</b> ${name}\n`;
+            message += `📞 <b>Телефон:</b> ${phone}\n`;
+            message += `🚚 <b>Способ:</b> Самовывоз (ул. Ярышлар, 2Б)\n\n`;
+            message += `🛒 <b>Состав заказа:</b>\n`;
+            cart.forEach(item => { message += `- ${item.name} x${item.qty} = ${item.price * item.qty}₽\n`; });
+            message += `\n💰 <b>ИТОГО: ${total} ₽</b>`;
+
+            if(BOT_TOKEN === 'YOUR_TELEGRAM_BOT_TOKEN_HERE') {
+                alert("Внимание: Настройте BOT_TOKEN и CHAT_ID в коде сайта или админке, чтобы заказы начали приходить в Telegram!");
+                showSuccess();
+                return;
+            }
+
+            try {
+                const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ chat_id: CHAT_ID, text: message, parse_mode: 'HTML' })
+                });
+
+                if(response.ok) {
+                    showSuccess();
+                } else {
+                    alert("Ошибка отправки заказа. Проверьте настройки бота.");
+                }
+            } catch(error) {
+                alert("Ошибка сети. Попробуйте еще раз.");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<i data-lucide="send" class="w-5 h-5 mr-2"></i> Отправить заказ`;
+                lucide.createIcons();
+            }
+        }
+
+        function showSuccess() {
+            closeCheckoutModal();
+            cart = [];
+            updateCartUI();
+            document.getElementById('success-modal').classList.remove('hidden');
+        }
+        function closeSuccessModal() {
+            document.getElementById('success-modal').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
