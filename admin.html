@@ -227,36 +227,12 @@
             checkAuth();
         }
 
-        // --- ДАННЫЕ ЗАКАЗОВ (Макет) ---
-        let mockOrders = [
-            {
-                id: '1024',
-                date: '26 фев, 14:30',
-                name: 'Алексей',
-                phone: '+7 (999) 123-45-67',
-                items: [
-                    { name: 'Пепперони', qty: 1, price: 550 },
-                    { name: 'Сыр', qty: 1, price: 50 }
-                ],
-                total: 600,
-                status: 'new' // new, cooking, done, canceled
-            },
-            {
-                id: '1025',
-                date: '26 фев, 14:45',
-                name: 'Мария',
-                phone: '+7 (900) 000-00-00',
-                items: [
-                    { name: 'Четыре вкуса', qty: 1, price: 770 },
-                    { name: 'Бургер', qty: 1, price: 650 }
-                ],
-                total: 1420,
-                status: 'cooking'
-            }
-        ];
+        // --- ИНТЕГРАЦИЯ С ПАМЯТЬЮ (LOCALSTORAGE) ---
+        // Загружаем заказы из памяти (оформленные на сайте)
+        let mockOrders = JSON.parse(localStorage.getItem('youpechka_orders')) || [];
 
-        // --- ДАННЫЕ МЕНЮ (Макет) ---
-        let menuItems = [
+        // Загружаем меню из памяти (или базовое, если пусто)
+        let menuItems = JSON.parse(localStorage.getItem('youpechka_menu')) || [
             { id: 1, category: 'Пицца', name: 'Пепперони', price: 550, size: '30 см', desc: 'Тонкое тесто, сливочный/томатный соус, сыр моцарелла, пепперони', tags: [], img: 'https://images.unsplash.com/photo-1628840042765-356cda07504e?w=500&q=80' },
             { id: 2, category: 'Пицца', name: 'Мясная', price: 650, size: '30 см', desc: 'Тонкое тесто, томатный соус, сыр моцарелла, ветчина, пепперони, куриная грудка, охотничьи колбаски, маслины', tags: ['Много мяса!'], img: 'https://images.unsplash.com/photo-1604381538336-254bc79a9f49?w=500&q=80' }
         ];
@@ -264,6 +240,11 @@
         document.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
             
+            // Загружаем настройки бота
+            const settings = JSON.parse(localStorage.getItem('youpechka_settings')) || {};
+            if(settings.botToken) document.getElementById('bot-token').value = settings.botToken;
+            if(settings.chatId) document.getElementById('chat-id').value = settings.chatId;
+
             // Загружаем данные только если ввели верный пароль
             if (checkAuth()) {
                 renderTable();
@@ -349,6 +330,7 @@
             const order = mockOrders.find(o => o.id === id);
             if (order) {
                 order.status = newStatus;
+                localStorage.setItem('youpechka_orders', JSON.stringify(mockOrders)); // Сохраняем статус
                 renderOrders();
             }
         }
@@ -415,6 +397,8 @@
             } else {
                 menuItems.push(newItem);
             }
+            
+            localStorage.setItem('youpechka_menu', JSON.stringify(menuItems)); // Сохраняем меню в память
             renderTable();
             closeForm();
         }
@@ -422,12 +406,16 @@
         function deleteItem(id) {
             if(confirm('Точно удалить?')) {
                 menuItems = menuItems.filter(i => i.id !== id);
+                localStorage.setItem('youpechka_menu', JSON.stringify(menuItems)); // Сохраняем меню в память
                 renderTable();
             }
         }
 
         function saveSettings(e) {
             e.preventDefault();
+            const token = document.getElementById('bot-token').value;
+            const chatId = document.getElementById('chat-id').value;
+            localStorage.setItem('youpechka_settings', JSON.stringify({ botToken: token, chatId: chatId }));
             alert(`Настройки сохранены!`);
         }
     </script>
