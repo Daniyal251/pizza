@@ -1,0 +1,14 @@
+# Безопасность: запрет доступа к config.php напрямую
+<Files "config.php">
+    Deny from all
+</Files>
+
+# Заголовки безопасности
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+# Кодировка UTF-8
+AddDefaultCharset utf-8
