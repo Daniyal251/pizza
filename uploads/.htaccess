@@ -1,0 +1,12 @@
+# Запрет выполнения PHP-скриптов в директории загрузок
+<FilesMatch "\.ph(p[2-7]?|t|tml)$">
+    Deny from all
+</FilesMatch>
+
+# Разрешаем только изображения
+<FilesMatch "\.(jpg|jpeg|png|webp|gif)$">
+    Allow from all
+</FilesMatch>
+
+# Отключаем листинг директории
+Options -Indexes

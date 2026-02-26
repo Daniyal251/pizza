@@ -7,42 +7,39 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
-    <style> 
-        body { font-family: 'Inter', sans-serif; background-color: #f5f5f4; } 
-        /* Прячем скроллбар для аккуратности */
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f5f5f4; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 10px; }
+        .tab-btn { transition: all 0.15s; }
     </style>
 </head>
 <body class="text-stone-800 antialiased h-screen w-full overflow-hidden">
 
-    <!-- ЭКРАН ВХОДА В АДМИНКУ -->
+    <!-- ЭКРАН ВХОДА -->
     <div id="login-view" class="fixed inset-0 z-[100] flex items-center justify-center bg-stone-100 p-4">
         <div class="bg-white p-8 rounded-3xl shadow-xl max-w-sm w-full border border-stone-200 text-center">
             <img src="logo.jpg" onerror="this.src='https://placehold.co/100x100/C68663/FFF?text=YP'" class="w-24 h-24 rounded-full mx-auto mb-4 border-4 border-stone-50 object-cover shadow-sm">
             <h2 class="text-2xl font-black text-stone-900 uppercase tracking-widest mb-1">You Печка</h2>
             <p class="text-stone-500 mb-8 text-sm font-medium">Вход в панель управления</p>
-            
             <form onsubmit="login(event)" class="space-y-4">
                 <div>
                     <input type="password" id="password-input" required placeholder="Введите пароль" class="w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-orange-500 outline-none text-center tracking-widest font-mono transition-shadow">
                     <p id="login-error" class="text-red-500 text-xs mt-2 hidden font-medium">Неверный пароль!</p>
                 </div>
-                <button type="submit" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-bold py-3 rounded-xl transition-colors shadow-md">
+                <button type="submit" id="login-btn" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-bold py-3 rounded-xl transition-colors shadow-md">
                     Войти
                 </button>
             </form>
         </div>
     </div>
 
-    <!-- ОСНОВНАЯ АДМИН-ПАНЕЛЬ (Адаптивная сетка) -->
+    <!-- ОСНОВНАЯ АДМИН-ПАНЕЛЬ -->
     <div id="dashboard-view" class="w-full h-full hidden flex-col md:flex-row">
-        
-        <!-- НАВИГАЦИЯ: Слева (Десктоп) / Сверху (Мобайл) -->
+
+        <!-- НАВИГАЦИЯ -->
         <aside class="bg-stone-900 text-white flex flex-col md:w-64 flex-shrink-0 z-20 shadow-md">
-            
-            <!-- Логотип -->
             <div class="p-4 md:p-6 border-b border-stone-800 flex items-center justify-between md:justify-start space-x-3">
                 <div class="flex items-center space-x-3">
                     <img src="logo.jpg" onerror="this.src='https://placehold.co/100x100/C68663/FFF?text=YP'" class="w-10 h-10 rounded-full object-cover border border-stone-700">
@@ -51,455 +48,1073 @@
                         <span class="text-[10px] text-stone-400 font-medium">Админ-панель</span>
                     </div>
                 </div>
-                <!-- Кнопка ВЫХОД только для мобилки (в шапке) -->
                 <button onclick="logout()" class="md:hidden p-2 text-stone-400 hover:text-white rounded-lg">
                     <i data-lucide="log-out" class="w-5 h-5"></i>
                 </button>
             </div>
 
-            <!-- Вкладки -->
-            <nav class="flex md:flex-col overflow-x-auto md:overflow-visible p-2 md:p-4 gap-2 flex-grow">
-                <button onclick="switchTab('orders')" id="tab-orders" class="whitespace-nowrap flex-1 md:flex-none flex items-center px-4 py-3 bg-orange-600 rounded-xl font-medium text-white transition-colors">
-                    <i data-lucide="bell" class="w-5 h-5 mr-2 md:mr-3"></i> 
-                    <span class="hidden md:inline">Заказы</span>
-                    <span class="md:hidden">Заказы</span>
-                    <!-- Динамический бейдж заказов -->
-                    <span id="orders-badge" class="hidden ml-2 md:ml-auto bg-white text-orange-600 text-xs font-bold px-2 py-0.5 rounded-full">0</span>
+            <nav class="flex md:flex-col overflow-x-auto md:overflow-visible p-2 md:p-4 gap-1.5 flex-grow">
+                <button onclick="switchTab('orders')" id="tab-orders" class="tab-btn whitespace-nowrap flex-1 md:flex-none flex items-center px-4 py-2.5 bg-orange-600 rounded-xl font-medium text-white text-sm">
+                    <i data-lucide="bell" class="w-4 h-4 mr-2 md:mr-3 flex-shrink-0"></i>
+                    <span>Заказы</span>
+                    <span id="orders-badge" class="hidden ml-auto bg-white text-orange-600 text-xs font-bold px-2 py-0.5 rounded-full">0</span>
                 </button>
-                <button onclick="switchTab('menu')" id="tab-menu" class="whitespace-nowrap flex-1 md:flex-none flex items-center px-4 py-3 text-stone-400 hover:bg-stone-800 hover:text-white rounded-xl font-medium transition-colors">
-                    <i data-lucide="pizza" class="w-5 h-5 mr-2 md:mr-3"></i> 
-                    Меню
+                <button onclick="switchTab('menu')" id="tab-menu" class="tab-btn whitespace-nowrap flex-1 md:flex-none flex items-center px-4 py-2.5 text-stone-400 hover:bg-stone-800 hover:text-white rounded-xl font-medium text-sm">
+                    <i data-lucide="pizza" class="w-4 h-4 mr-2 md:mr-3 flex-shrink-0"></i>
+                    <span>Меню</span>
                 </button>
-                <button onclick="switchTab('settings')" id="tab-settings" class="whitespace-nowrap flex-1 md:flex-none flex items-center px-4 py-3 text-stone-400 hover:bg-stone-800 hover:text-white rounded-xl font-medium transition-colors">
-                    <i data-lucide="settings" class="w-5 h-5 mr-2 md:mr-3"></i> 
-                    Настройки
+                <button onclick="switchTab('delivery')" id="tab-delivery" class="tab-btn whitespace-nowrap flex-1 md:flex-none flex items-center px-4 py-2.5 text-stone-400 hover:bg-stone-800 hover:text-white rounded-xl font-medium text-sm">
+                    <i data-lucide="truck" class="w-4 h-4 mr-2 md:mr-3 flex-shrink-0"></i>
+                    <span>Доставка</span>
+                </button>
+                <button onclick="switchTab('promos')" id="tab-promos" class="tab-btn whitespace-nowrap flex-1 md:flex-none flex items-center px-4 py-2.5 text-stone-400 hover:bg-stone-800 hover:text-white rounded-xl font-medium text-sm">
+                    <i data-lucide="ticket-percent" class="w-4 h-4 mr-2 md:mr-3 flex-shrink-0"></i>
+                    <span>Промокоды</span>
+                </button>
+                <button onclick="switchTab('analytics')" id="tab-analytics" class="tab-btn whitespace-nowrap flex-1 md:flex-none flex items-center px-4 py-2.5 text-stone-400 hover:bg-stone-800 hover:text-white rounded-xl font-medium text-sm">
+                    <i data-lucide="bar-chart-3" class="w-4 h-4 mr-2 md:mr-3 flex-shrink-0"></i>
+                    <span>Аналитика</span>
+                </button>
+                <button onclick="switchTab('settings')" id="tab-settings" class="tab-btn whitespace-nowrap flex-1 md:flex-none flex items-center px-4 py-2.5 text-stone-400 hover:bg-stone-800 hover:text-white rounded-xl font-medium text-sm">
+                    <i data-lucide="settings" class="w-4 h-4 mr-2 md:mr-3 flex-shrink-0"></i>
+                    <span>Настройки</span>
                 </button>
             </nav>
 
-            <!-- Кнопки внизу (только для Десктопа) -->
             <div class="hidden md:block p-4 border-t border-stone-800 space-y-2 mt-auto">
-                <a href="index.html" target="_blank" class="w-full flex items-center justify-center px-4 py-3 bg-stone-800 hover:bg-stone-700 rounded-xl transition-colors text-sm font-medium">
+                <a href="index.html" target="_blank" class="w-full flex items-center justify-center px-4 py-2.5 bg-stone-800 hover:bg-stone-700 rounded-xl transition-colors text-sm font-medium">
                     <i data-lucide="external-link" class="w-4 h-4 mr-2"></i> Открыть сайт
                 </a>
-                <button onclick="logout()" class="w-full flex items-center justify-center px-4 py-3 text-stone-400 hover:text-red-400 hover:bg-red-400/10 rounded-xl transition-colors text-sm font-medium">
+                <button onclick="logout()" class="w-full flex items-center justify-center px-4 py-2.5 text-stone-400 hover:text-red-400 hover:bg-red-400/10 rounded-xl transition-colors text-sm font-medium">
                     <i data-lucide="log-out" class="w-4 h-4 mr-2"></i> Выйти
                 </button>
             </div>
         </aside>
 
-        <!-- КОНТЕНТНАЯ ЧАСТЬ -->
+        <!-- КОНТЕНТ -->
         <main class="flex-grow overflow-y-auto p-4 md:p-8 relative">
-            
-            <!-- Вкладка: ЗАКАЗЫ -->
-            <div id="view-orders" class="max-w-6xl mx-auto block">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl md:text-3xl font-bold">Текущие заказы</h2>
-                    <button onclick="renderOrders()" class="text-stone-500 hover:text-stone-900 flex items-center bg-white px-3 py-2 md:px-4 rounded-xl shadow-sm border border-stone-200 transition-colors text-sm">
-                        <i data-lucide="refresh-cw" class="w-4 h-4 mr-0 md:mr-2"></i> <span class="hidden md:inline">Обновить</span>
-                    </button>
-                </div>
 
-                <!-- Сетка заказов -->
-                <div id="orders-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                    <!-- Заказы генерируются через JS -->
+            <!-- ===================== ЗАКАЗЫ ===================== -->
+            <div id="view-orders" class="max-w-6xl mx-auto block">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
+                    <h2 class="text-2xl md:text-3xl font-bold">Заказы</h2>
+                    <div class="flex items-center gap-2">
+                        <select id="orders-filter" onchange="loadOrders()" class="px-3 py-2 rounded-xl border border-stone-200 bg-white text-sm outline-none focus:ring-2 focus:ring-orange-500">
+                            <option value="">Все статусы</option>
+                            <option value="new">Новые</option>
+                            <option value="cooking">Готовятся</option>
+                            <option value="ready">Готовы</option>
+                            <option value="delivering">Доставляются</option>
+                            <option value="done">Выданы</option>
+                            <option value="canceled">Отмененные</option>
+                        </select>
+                        <button onclick="loadOrders()" class="text-stone-500 hover:text-stone-900 flex items-center bg-white px-3 py-2 rounded-xl shadow-sm border border-stone-200 transition-colors text-sm">
+                            <i data-lucide="refresh-cw" class="w-4 h-4 mr-0 md:mr-2"></i><span class="hidden md:inline">Обновить</span>
+                        </button>
+                    </div>
                 </div>
+                <div id="orders-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"></div>
             </div>
 
-            <!-- Вкладка: МЕНЮ -->
+            <!-- ===================== МЕНЮ ===================== -->
             <div id="view-menu" class="max-w-6xl mx-auto hidden">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                     <h2 class="text-2xl md:text-3xl font-bold">Настройка меню</h2>
-                    <button onclick="openForm()" class="w-full md:w-auto bg-orange-600 hover:bg-orange-500 text-white px-5 py-3 md:py-2.5 rounded-xl font-medium flex justify-center items-center shadow-sm transition-colors">
-                        <i data-lucide="plus" class="w-5 h-5 mr-2"></i> Добавить позицию
-                    </button>
+                    <div class="flex gap-2">
+                        <button onclick="openCategoryModal()" class="bg-stone-700 hover:bg-stone-600 text-white px-4 py-2.5 rounded-xl font-medium flex items-center shadow-sm transition-colors text-sm">
+                            <i data-lucide="folder-plus" class="w-4 h-4 mr-2"></i> Категория
+                        </button>
+                        <button onclick="openMenuForm()" class="bg-orange-600 hover:bg-orange-500 text-white px-5 py-2.5 rounded-xl font-medium flex items-center shadow-sm transition-colors text-sm">
+                            <i data-lucide="plus" class="w-4 h-4 mr-2"></i> Добавить блюдо
+                        </button>
+                    </div>
                 </div>
-
-                <!-- Таблица меню с горизонтальным скроллом на мобилках -->
                 <div class="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-x-auto">
                     <table class="w-full text-left border-collapse min-w-[600px]">
                         <thead>
-                            <tr class="bg-stone-50 border-b border-stone-200 text-stone-500 text-xs md:text-sm uppercase tracking-wider">
+                            <tr class="bg-stone-50 border-b border-stone-200 text-stone-500 text-xs uppercase tracking-wider">
                                 <th class="p-4 w-16">Фото</th>
                                 <th class="p-4">Название</th>
                                 <th class="p-4">Категория</th>
                                 <th class="p-4">Цена</th>
+                                <th class="p-4 text-center">Статус</th>
                                 <th class="p-4 text-right">Действия</th>
                             </tr>
                         </thead>
-                        <tbody id="menu-table" class="divide-y divide-stone-100">
-                            <!-- Данные меню генерируются через JS -->
-                        </tbody>
+                        <tbody id="menu-table" class="divide-y divide-stone-100"></tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- Вкладка: НАСТРОЙКИ -->
+            <!-- ===================== ДОСТАВКА ===================== -->
+            <div id="view-delivery" class="max-w-3xl mx-auto hidden">
+                <h2 class="text-2xl md:text-3xl font-bold mb-6">Настройки доставки</h2>
+                <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-stone-200 space-y-6">
+                    <div class="flex items-center justify-between pb-4 border-b border-stone-100">
+                        <div>
+                            <h3 class="font-bold text-lg">Доставка включена</h3>
+                            <p class="text-stone-500 text-sm">Клиенты смогут выбирать доставку при оформлении заказа</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="delivery-enabled" class="sr-only peer">
+                            <div class="w-11 h-6 bg-stone-300 peer-focus:ring-2 peer-focus:ring-orange-500 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
+                        </label>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-stone-700 mb-2">Адрес самовывоза</label>
+                        <input type="text" id="pickup-address" class="w-full px-4 py-3 border border-stone-200 rounded-xl outline-none focus:ring-2 focus:ring-orange-500 text-sm" placeholder="ул. Ярышлар, 2Б">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-stone-700 mb-2">Минимальная сумма заказа (руб.)</label>
+                        <input type="number" id="min-order-amount" class="w-full px-4 py-3 border border-stone-200 rounded-xl outline-none focus:ring-2 focus:ring-orange-500 text-sm" placeholder="0">
+                    </div>
+
+                    <div class="pt-4 border-t border-stone-100">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-lg">Зоны доставки</h3>
+                            <button onclick="addDeliveryZone()" class="text-sm bg-stone-100 hover:bg-stone-200 px-3 py-1.5 rounded-lg font-medium transition-colors">
+                                <i data-lucide="plus" class="w-3 h-3 inline mr-1"></i>Добавить зону
+                            </button>
+                        </div>
+                        <div id="delivery-zones" class="space-y-3"></div>
+                    </div>
+
+                    <button onclick="saveDelivery()" class="w-full md:w-auto bg-stone-900 hover:bg-stone-800 text-white font-bold px-6 py-3 rounded-xl shadow flex justify-center items-center transition-colors text-sm">
+                        <i data-lucide="save" class="w-4 h-4 mr-2"></i> Сохранить настройки доставки
+                    </button>
+                </div>
+            </div>
+
+            <!-- ===================== ПРОМОКОДЫ ===================== -->
+            <div id="view-promos" class="max-w-4xl mx-auto hidden">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                    <h2 class="text-2xl md:text-3xl font-bold">Промокоды</h2>
+                    <button onclick="openPromoForm()" class="bg-orange-600 hover:bg-orange-500 text-white px-5 py-2.5 rounded-xl font-medium flex items-center shadow-sm transition-colors text-sm">
+                        <i data-lucide="plus" class="w-4 h-4 mr-2"></i> Новый промокод
+                    </button>
+                </div>
+                <div class="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-x-auto">
+                    <table class="w-full text-left border-collapse min-w-[700px]">
+                        <thead>
+                            <tr class="bg-stone-50 border-b border-stone-200 text-stone-500 text-xs uppercase tracking-wider">
+                                <th class="p-4">Код</th>
+                                <th class="p-4">Скидка</th>
+                                <th class="p-4">Мин. заказ</th>
+                                <th class="p-4">Использований</th>
+                                <th class="p-4">Действует</th>
+                                <th class="p-4 text-center">Статус</th>
+                                <th class="p-4 text-right">Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody id="promos-table" class="divide-y divide-stone-100"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ===================== АНАЛИТИКА ===================== -->
+            <div id="view-analytics" class="max-w-6xl mx-auto hidden">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
+                    <h2 class="text-2xl md:text-3xl font-bold">Аналитика</h2>
+                    <div class="flex gap-2">
+                        <select id="analytics-period" onchange="loadAnalytics()" class="px-3 py-2 rounded-xl border border-stone-200 bg-white text-sm outline-none focus:ring-2 focus:ring-orange-500">
+                            <option value="today">Сегодня</option>
+                            <option value="week" selected>Неделя</option>
+                            <option value="month">Месяц</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- Summary cards -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm">
+                        <p class="text-stone-500 text-xs font-medium uppercase tracking-wider mb-1">Заказов</p>
+                        <p id="stat-orders" class="text-3xl font-black text-stone-900">0</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm">
+                        <p class="text-stone-500 text-xs font-medium uppercase tracking-wider mb-1">Выручка</p>
+                        <p id="stat-revenue" class="text-3xl font-black text-orange-600">0 ₽</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm">
+                        <p class="text-stone-500 text-xs font-medium uppercase tracking-wider mb-1">Средний чек</p>
+                        <p id="stat-avg" class="text-3xl font-black text-stone-900">0 ₽</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm">
+                        <p class="text-stone-500 text-xs font-medium uppercase tracking-wider mb-1">Отменены</p>
+                        <p id="stat-canceled" class="text-3xl font-black text-red-500">0</p>
+                    </div>
+                </div>
+                <!-- Charts area -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm">
+                        <h3 class="font-bold text-lg mb-4">Выручка по дням</h3>
+                        <div id="chart-daily" class="space-y-2"></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm">
+                        <h3 class="font-bold text-lg mb-4">Популярные позиции</h3>
+                        <div id="chart-popular" class="space-y-2"></div>
+                    </div>
+                </div>
+                <!-- Status breakdown -->
+                <div class="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm mt-6">
+                    <h3 class="font-bold text-lg mb-4">Заказы по статусам (все время)</h3>
+                    <div id="status-breakdown" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3"></div>
+                </div>
+            </div>
+
+            <!-- ===================== НАСТРОЙКИ ===================== -->
             <div id="view-settings" class="max-w-3xl mx-auto hidden">
-                <h2 class="text-2xl md:text-3xl font-bold mb-6">Настройки Telegram Бота</h2>
-                
+                <h2 class="text-2xl md:text-3xl font-bold mb-6">Настройки</h2>
+
+                <!-- Telegram -->
                 <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-stone-200 mb-6">
-                    <div class="flex flex-col md:flex-row items-start md:items-center mb-6 pb-6 border-b border-stone-100 gap-4">
+                    <div class="flex items-start gap-4 mb-6 pb-6 border-b border-stone-100">
                         <div class="w-12 h-12 bg-blue-100 text-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
                             <i data-lucide="bot" class="w-6 h-6"></i>
                         </div>
                         <div>
-                            <h3 class="text-xl font-bold mb-1">Куда будут приходить заказы?</h3>
-                            <p class="text-stone-500 text-sm">Чтобы заказы с сайта падали вам в Telegram, создайте бота через <a href="https://t.me/BotFather" target="_blank" class="text-blue-500 underline">@BotFather</a> и вставьте его данные сюда.</p>
+                            <h3 class="text-xl font-bold mb-1">Telegram Бот</h3>
+                            <p class="text-stone-500 text-sm">Заказы будут приходить в Telegram. Создайте бота через <a href="https://t.me/BotFather" target="_blank" class="text-blue-500 underline">@BotFather</a>.</p>
                         </div>
                     </div>
-
-                    <form onsubmit="saveSettings(event)" class="space-y-6">
+                    <div class="space-y-4">
                         <div>
-                            <label class="block font-medium text-stone-700 mb-2 text-sm">Bot Token (API Ключ)</label>
-                            <input type="text" id="bot-token" class="w-full px-4 py-3 border border-stone-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none font-mono text-sm" placeholder="Например: 123456789:ABCdefGHIjklMNOpqrs...">
+                            <label class="block font-medium text-stone-700 mb-2 text-sm">Bot Token</label>
+                            <input type="text" id="bot-token" class="w-full px-4 py-3 border border-stone-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none font-mono text-sm" placeholder="123456789:ABCdefGHI...">
                         </div>
                         <div>
-                            <label class="block font-medium text-stone-700 mb-2 text-sm">Chat ID (Ваш ID или ID группы)</label>
-                            <input type="text" id="chat-id" class="w-full px-4 py-3 border border-stone-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none font-mono text-sm" placeholder="Например: 987654321">
-                            <p class="text-xs text-stone-400 mt-2">Узнать свой Chat ID можно у бота <a href="https://t.me/getmyid_bot" target="_blank" class="text-blue-500 hover:underline">@getmyid_bot</a>.</p>
+                            <label class="block font-medium text-stone-700 mb-2 text-sm">Chat ID</label>
+                            <input type="text" id="chat-id" class="w-full px-4 py-3 border border-stone-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none font-mono text-sm" placeholder="987654321">
+                            <p class="text-xs text-stone-400 mt-2">Узнать Chat ID: <a href="https://t.me/getmyid_bot" target="_blank" class="text-blue-500 hover:underline">@getmyid_bot</a></p>
                         </div>
-                        <button type="submit" class="w-full md:w-auto bg-stone-900 hover:bg-stone-800 text-white font-bold px-6 py-3 rounded-xl shadow flex justify-center items-center transition-colors">
-                            <i data-lucide="save" class="w-5 h-5 mr-2"></i> Сохранить настройки
+                        <button onclick="testTelegram()" class="text-sm bg-blue-50 hover:bg-blue-100 text-blue-600 px-4 py-2 rounded-xl font-medium transition-colors">
+                            <i data-lucide="send" class="w-3 h-3 inline mr-1"></i> Тест отправки
                         </button>
-                    </form>
+                    </div>
                 </div>
+
+                <!-- General settings -->
+                <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-stone-200 mb-6">
+                    <h3 class="text-xl font-bold mb-6">Общие настройки</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block font-medium text-stone-700 mb-2 text-sm">Телефон пиццерии</label>
+                            <input type="text" id="restaurant-phone" class="w-full px-4 py-3 border border-stone-200 rounded-xl outline-none focus:ring-2 focus:ring-orange-500 text-sm" placeholder="+7 (929) 725-24-55">
+                        </div>
+                        <div>
+                            <label class="block font-medium text-stone-700 mb-2 text-sm">Режим работы</label>
+                            <input type="text" id="working-hours" class="w-full px-4 py-3 border border-stone-200 rounded-xl outline-none focus:ring-2 focus:ring-orange-500 text-sm" placeholder="Ежедневно 10:00 – 21:00">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Change password -->
+                <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-stone-200 mb-6">
+                    <h3 class="text-xl font-bold mb-6">Смена пароля</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block font-medium text-stone-700 mb-2 text-sm">Новый пароль</label>
+                            <input type="password" id="new-password" class="w-full px-4 py-3 border border-stone-200 rounded-xl outline-none focus:ring-2 focus:ring-orange-500 text-sm" placeholder="Минимум 4 символа">
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="saveSettings()" class="w-full md:w-auto bg-stone-900 hover:bg-stone-800 text-white font-bold px-6 py-3 rounded-xl shadow flex justify-center items-center transition-colors text-sm">
+                    <i data-lucide="save" class="w-4 h-4 mr-2"></i> Сохранить все настройки
+                </button>
             </div>
 
-            <!-- МОДАЛЬНОЕ ОКНО ДОБАВЛЕНИЯ / РЕДАКТИРОВАНИЯ -->
-            <div id="form-modal" class="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
-                <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl flex flex-col max-h-[90vh]">
-                    <div class="p-5 border-b border-stone-100 flex justify-between items-center bg-stone-50 rounded-t-3xl">
-                        <h3 id="modal-title" class="text-xl font-bold">Добавить позицию</h3>
-                        <button onclick="closeForm()" class="text-stone-400 hover:text-stone-700 transition-colors p-1"><i data-lucide="x" class="w-6 h-6"></i></button>
-                    </div>
-                    <form id="item-form" onsubmit="saveItem(event)" class="p-5 space-y-4 overflow-y-auto">
-                        <input type="hidden" id="item-id">
-                        <div>
-                            <label class="block text-sm font-medium mb-1 text-stone-600">Название</label>
-                            <input required type="text" id="item-name" class="w-full px-4 py-2 border border-stone-200 rounded-xl outline-none focus:ring-2 focus:ring-orange-500 transition-shadow">
-                        </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium mb-1 text-stone-600">Категория</label>
-                                <select id="item-category" class="w-full px-4 py-2 border border-stone-200 rounded-xl outline-none bg-white focus:ring-2 focus:ring-orange-500">
-                                    <option>Популярное</option>
-                                    <option>Пицца</option>
-                                    <option>Дополни пиццу</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium mb-1 text-stone-600">Цена (₽)</label>
-                                <input required type="number" id="item-price" class="w-full px-4 py-2 border border-stone-200 rounded-xl outline-none focus:ring-2 focus:ring-orange-500 transition-shadow">
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium mb-1 text-stone-600">Размер</label>
-                                <input type="text" id="item-size" placeholder="30 см" class="w-full px-4 py-2 border border-stone-200 rounded-xl outline-none focus:ring-2 focus:ring-orange-500 transition-shadow">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium mb-1 text-stone-600">Теги (через запятую)</label>
-                                <input type="text" id="item-tags" placeholder="🔥, Острая" class="w-full px-4 py-2 border border-stone-200 rounded-xl outline-none focus:ring-2 focus:ring-orange-500 transition-shadow">
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium mb-1 text-stone-600">Описание (состав)</label>
-                            <textarea id="item-desc" rows="2" class="w-full px-4 py-2 border border-stone-200 rounded-xl outline-none resize-none focus:ring-2 focus:ring-orange-500 transition-shadow"></textarea>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium mb-1 text-stone-600">Ссылка на фото</label>
-                            <input type="url" id="item-img" class="w-full px-4 py-2 border border-stone-200 rounded-xl outline-none focus:ring-2 focus:ring-orange-500 transition-shadow" placeholder="https://...">
-                        </div>
-                        <div class="flex flex-col-reverse md:flex-row justify-end pt-4 border-t border-stone-100 gap-3 mt-6">
-                            <button type="button" onclick="closeForm()" class="px-5 py-3 md:py-2.5 text-stone-600 bg-stone-100 hover:bg-stone-200 rounded-xl transition-colors font-medium">Отмена</button>
-                            <button type="submit" class="px-5 py-3 md:py-2.5 text-white bg-orange-600 hover:bg-orange-500 rounded-xl font-medium transition-colors">Сохранить</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
         </main>
     </div>
 
-    <script>
-        // --- AUTH LOGIC (СИСТЕМА ВХОДА) ---
-        const ADMIN_PASSWORD = "admin"; // Пароль для входа в админку
+    <!-- ===================== МОДАЛКИ ===================== -->
 
-        function checkAuth() {
-            const isAuth = sessionStorage.getItem('youpechka_auth') === 'true';
-            document.getElementById('login-view').classList.toggle('hidden', isAuth);
-            document.getElementById('dashboard-view').classList.toggle('hidden', !isAuth);
-            document.getElementById('dashboard-view').style.display = isAuth ? 'flex' : 'none';
-            return isAuth;
-        }
-
-        function login(e) {
-            e.preventDefault();
-            const pwd = document.getElementById('password-input').value;
-            if (pwd === ADMIN_PASSWORD) {
-                sessionStorage.setItem('youpechka_auth', 'true');
-                document.getElementById('password-input').value = '';
-                document.getElementById('login-error').classList.add('hidden');
-                initAdmin();
-            } else {
-                document.getElementById('login-error').classList.remove('hidden');
-            }
-        }
-
-        function logout() {
-            sessionStorage.removeItem('youpechka_auth');
-            checkAuth();
-        }
-
-
-        // --- ИНТЕГРАЦИЯ ДАННЫХ (LOCALSTORAGE) ---
-        let mockOrders = [];
-        let menuItems = [];
-
-        function loadData() {
-            mockOrders = JSON.parse(localStorage.getItem('youpechka_orders')) || [];
-            menuItems = JSON.parse(localStorage.getItem('youpechka_menu')) || [];
-            
-            const settings = JSON.parse(localStorage.getItem('youpechka_settings')) || {};
-            if(settings.botToken) document.getElementById('bot-token').value = settings.botToken;
-            if(settings.chatId) document.getElementById('chat-id').value = settings.chatId;
-        }
-
-        // Автоматическое обновление если заказы пришли с сайта
-        window.addEventListener('storage', function(e) {
-            if (e.key === 'youpechka_orders') {
-                mockOrders = JSON.parse(e.newValue) || [];
-                renderOrders();
-            }
-            if (e.key === 'youpechka_menu') {
-                menuItems = JSON.parse(e.newValue) || [];
-                renderTable();
-            }
-        });
-
-        function initAdmin() {
-            if (checkAuth()) {
-                lucide.createIcons();
-                loadData();
-                renderTable();
-                renderOrders();
-                switchTab('orders');
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', initAdmin);
-
-
-        // --- TABS LOGIC ---
-        function switchTab(tab) {
-            document.getElementById('view-menu').classList.toggle('hidden', tab !== 'menu');
-            document.getElementById('view-settings').classList.toggle('hidden', tab !== 'settings');
-            document.getElementById('view-orders').classList.toggle('hidden', tab !== 'orders');
-            
-            const activeClass = 'whitespace-nowrap flex-1 md:flex-none flex items-center px-4 py-3 bg-orange-600 rounded-xl font-medium text-white transition-colors shadow-sm';
-            const inactiveClass = 'whitespace-nowrap flex-1 md:flex-none flex items-center px-4 py-3 text-stone-400 hover:bg-stone-200 hover:text-stone-800 rounded-xl font-medium transition-colors';
-
-            document.getElementById('tab-menu').className = tab === 'menu' ? activeClass : inactiveClass;
-            document.getElementById('tab-settings').className = tab === 'settings' ? activeClass : inactiveClass;
-            document.getElementById('tab-orders').className = tab === 'orders' ? activeClass : inactiveClass;
-        }
-
-
-        // --- ORDERS LOGIC ---
-        function renderOrders() {
-            const container = document.getElementById('orders-container');
-            const badge = document.getElementById('orders-badge');
-            
-            // Считаем активные (новые и готовящиеся) заказы для бейджика
-            const activeOrders = mockOrders.filter(o => o.status === 'new' || o.status === 'cooking').length;
-            if (activeOrders > 0) {
-                badge.textContent = activeOrders;
-                badge.classList.remove('hidden');
-            } else {
-                badge.classList.add('hidden');
-            }
-
-            container.innerHTML = '';
-
-            if (mockOrders.length === 0) {
-                container.innerHTML = `
-                    <div class="col-span-full text-center py-16 bg-white rounded-3xl border border-stone-200 shadow-sm">
-                        <i data-lucide="inbox" class="w-16 h-16 text-stone-200 mx-auto mb-4"></i>
-                        <h3 class="text-xl font-bold text-stone-400">Пока нет заказов</h3>
-                        <p class="text-sm text-stone-400 mt-2">Когда клиент оформит заказ на сайте, он появится здесь.</p>
-                    </div>`;
-                lucide.createIcons();
-                return;
-            }
-
-            const statusConfig = {
-                'new': { color: 'bg-red-500', text: 'Новый заказ' },
-                'cooking': { color: 'bg-yellow-500', text: 'Готовится' },
-                'done': { color: 'bg-green-500', text: 'Выдан' },
-                'canceled': { color: 'bg-stone-300 text-stone-600', text: 'Отменен' }
-            };
-
-            mockOrders.forEach(order => {
-                const conf = statusConfig[order.status] || statusConfig['new'];
-                
-                let itemsHtml = order.items.map(i => `
-                    <div class="flex justify-between text-sm mb-2 border-b border-stone-200/50 pb-1 last:border-0">
-                        <span class="text-stone-700"><span class="font-bold text-stone-900">${i.qty} x</span> ${i.name}</span>
-                        <span class="font-medium text-stone-900">${i.price * i.qty} ₽</span>
+    <!-- Модалка: Добавление/редактирование блюда -->
+    <div id="menu-modal" class="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl flex flex-col max-h-[90vh]">
+            <div class="p-5 border-b border-stone-100 flex justify-between items-center bg-stone-50 rounded-t-3xl">
+                <h3 id="menu-modal-title" class="text-xl font-bold">Добавить блюдо</h3>
+                <button onclick="closeMenuForm()" class="text-stone-400 hover:text-stone-700 p-1"><i data-lucide="x" class="w-6 h-6"></i></button>
+            </div>
+            <form id="menu-form" onsubmit="saveMenuItem(event)" class="p-5 space-y-4 overflow-y-auto">
+                <input type="hidden" id="item-id">
+                <div>
+                    <label class="block text-sm font-medium mb-1 text-stone-600">Название</label>
+                    <input required type="text" id="item-name" class="w-full px-4 py-2 border border-stone-200 rounded-xl outline-none focus:ring-2 focus:ring-orange-500">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1 text-stone-600">Категория</label>
+                        <select id="item-category" class="w-full px-4 py-2 border border-stone-200 rounded-xl outline-none bg-white focus:ring-2 focus:ring-orange-500"></select>
                     </div>
-                `).join('');
-
-                const isInactive = order.status === 'done' || order.status === 'canceled';
-
-                const card = document.createElement('div');
-                card.className = `bg-white rounded-3xl p-6 shadow-sm border border-stone-200 flex flex-col transition-opacity ${isInactive ? 'opacity-60 grayscale-[30%]' : ''}`;
-                card.innerHTML = `
-                    <div class="flex justify-between items-start mb-4">
-                        <div>
-                            <h3 class="font-black text-xl text-stone-900">Заказ #${order.id}</h3>
-                            <p class="text-xs font-medium text-stone-400">${order.date}</p>
-                        </div>
-                        <span class="${conf.color} text-[10px] uppercase tracking-wider font-bold px-3 py-1.5 rounded-full shadow-sm">${conf.text}</span>
+                    <div>
+                        <label class="block text-sm font-medium mb-1 text-stone-600">Цена (руб.)</label>
+                        <input required type="number" id="item-price" class="w-full px-4 py-2 border border-stone-200 rounded-xl outline-none focus:ring-2 focus:ring-orange-500">
                     </div>
-                    
-                    <div class="bg-stone-50 p-5 rounded-2xl mb-4 flex-grow border border-stone-100">
-                        <div class="mb-4 pb-4 border-b border-stone-200">
-                            <div class="font-bold flex items-center mb-1 text-stone-800"><i data-lucide="user" class="w-4 h-4 mr-2 text-stone-400"></i>${order.name}</div>
-                            <div class="text-stone-600 flex items-center text-sm font-medium"><i data-lucide="phone" class="w-4 h-4 mr-2 text-stone-400"></i><a href="tel:${order.phone}" class="hover:text-blue-500">${order.phone}</a></div>
-                        </div>
-                        <div class="mb-2">
-                            <p class="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-3">Состав заказа</p>
-                            ${itemsHtml}
-                        </div>
-                        <div class="flex justify-between items-center mt-4 pt-4 border-t border-stone-200">
-                            <span class="font-bold text-stone-400 uppercase text-xs tracking-wider">Итого</span>
-                            <span class="font-black text-2xl text-orange-600">${order.total} ₽</span>
-                        </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1 text-stone-600">Размер</label>
+                        <input type="text" id="item-size" placeholder="30 см" class="w-full px-4 py-2 border border-stone-200 rounded-xl outline-none focus:ring-2 focus:ring-orange-500">
                     </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1 text-stone-600">Теги (через запятую)</label>
+                        <input type="text" id="item-tags" placeholder="New!, Острая" class="w-full px-4 py-2 border border-stone-200 rounded-xl outline-none focus:ring-2 focus:ring-orange-500">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1 text-stone-600">Описание</label>
+                    <textarea id="item-desc" rows="2" class="w-full px-4 py-2 border border-stone-200 rounded-xl outline-none resize-none focus:ring-2 focus:ring-orange-500"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1 text-stone-600">Фото</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="item-img" class="flex-1 px-4 py-2 border border-stone-200 rounded-xl outline-none focus:ring-2 focus:ring-orange-500 text-sm" placeholder="URL или загрузите файл">
+                        <label class="bg-stone-100 hover:bg-stone-200 px-3 py-2 rounded-xl cursor-pointer transition-colors flex items-center text-sm font-medium">
+                            <i data-lucide="upload" class="w-4 h-4 mr-1"></i> Файл
+                            <input type="file" id="item-file" accept="image/*" onchange="uploadImage(this)" class="hidden">
+                        </label>
+                    </div>
+                </div>
+                <div class="flex flex-col-reverse md:flex-row justify-end pt-4 border-t border-stone-100 gap-3 mt-4">
+                    <button type="button" onclick="closeMenuForm()" class="px-5 py-2.5 text-stone-600 bg-stone-100 hover:bg-stone-200 rounded-xl transition-colors font-medium">Отмена</button>
+                    <button type="submit" class="px-5 py-2.5 text-white bg-orange-600 hover:bg-orange-500 rounded-xl font-medium transition-colors">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-                    <div class="flex gap-2 mt-auto">
-                        ${order.status === 'new' ? `<button onclick="changeOrderStatus('${order.id}', 'cooking')" class="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 rounded-xl transition-colors text-sm shadow-sm">Начать готовить</button>` : ''}
-                        ${order.status === 'cooking' ? `<button onclick="changeOrderStatus('${order.id}', 'done')" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-xl transition-colors text-sm shadow-sm">Выдать клиенту</button>` : ''}
-                        ${!isInactive ? `<button onclick="changeOrderStatus('${order.id}', 'canceled')" class="px-4 bg-stone-100 hover:bg-red-100 text-stone-500 hover:text-red-500 font-bold py-3 rounded-xl transition-colors text-sm" title="Отменить заказ"><i data-lucide="x" class="w-5 h-5 mx-auto"></i></button>` : ''}
+    <!-- Модалка: Категория -->
+    <div id="category-modal" class="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl w-full max-w-sm shadow-2xl">
+            <div class="p-5 border-b border-stone-100 flex justify-between items-center bg-stone-50 rounded-t-3xl">
+                <h3 class="text-xl font-bold">Управление категориями</h3>
+                <button onclick="closeCategoryModal()" class="text-stone-400 hover:text-stone-700 p-1"><i data-lucide="x" class="w-6 h-6"></i></button>
+            </div>
+            <div class="p-5 space-y-4">
+                <div id="categories-list" class="space-y-2"></div>
+                <div class="flex gap-2 pt-2 border-t border-stone-100">
+                    <input type="text" id="new-category-name" placeholder="Новая категория" class="flex-1 px-4 py-2 border border-stone-200 rounded-xl outline-none focus:ring-2 focus:ring-orange-500 text-sm">
+                    <button onclick="addCategory()" class="bg-orange-600 hover:bg-orange-500 text-white px-4 py-2 rounded-xl text-sm font-medium transition-colors">Добавить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модалка: Промокод -->
+    <div id="promo-modal" class="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl w-full max-w-md shadow-2xl flex flex-col max-h-[90vh]">
+            <div class="p-5 border-b border-stone-100 flex justify-between items-center bg-stone-50 rounded-t-3xl">
+                <h3 id="promo-modal-title" class="text-xl font-bold">Новый промокод</h3>
+                <button onclick="closePromoForm()" class="text-stone-400 hover:text-stone-700 p-1"><i data-lucide="x" class="w-6 h-6"></i></button>
+            </div>
+            <form id="promo-form" onsubmit="savePromo(event)" class="p-5 space-y-4 overflow-y-auto">
+                <input type="hidden" id="promo-id">
+                <div>
+                    <label class="block text-sm font-medium mb-1 text-stone-600">Код промокода</label>
+                    <input required type="text" id="promo-code" class="w-full px-4 py-2 border border-stone-200 rounded-xl outline-none focus:ring-2 focus:ring-orange-500 uppercase font-mono" placeholder="PIZZA2024">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1 text-stone-600">Тип скидки</label>
+                        <select id="promo-type" class="w-full px-4 py-2 border border-stone-200 rounded-xl outline-none bg-white focus:ring-2 focus:ring-orange-500">
+                            <option value="percent">Процент (%)</option>
+                            <option value="fixed">Фикс. сумма (руб.)</option>
+                        </select>
                     </div>
-                `;
-                container.appendChild(card);
+                    <div>
+                        <label class="block text-sm font-medium mb-1 text-stone-600">Значение</label>
+                        <input required type="number" id="promo-value" min="1" class="w-full px-4 py-2 border border-stone-200 rounded-xl outline-none focus:ring-2 focus:ring-orange-500" placeholder="10">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1 text-stone-600">Мин. заказ (руб.)</label>
+                        <input type="number" id="promo-min" class="w-full px-4 py-2 border border-stone-200 rounded-xl outline-none focus:ring-2 focus:ring-orange-500" placeholder="0">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1 text-stone-600">Макс. использований</label>
+                        <input type="number" id="promo-max-uses" class="w-full px-4 py-2 border border-stone-200 rounded-xl outline-none focus:ring-2 focus:ring-orange-500" placeholder="Без лимита">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1 text-stone-600">Действует с</label>
+                        <input type="date" id="promo-from" class="w-full px-4 py-2 border border-stone-200 rounded-xl outline-none focus:ring-2 focus:ring-orange-500 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1 text-stone-600">Действует до</label>
+                        <input type="date" id="promo-until" class="w-full px-4 py-2 border border-stone-200 rounded-xl outline-none focus:ring-2 focus:ring-orange-500 text-sm">
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" id="promo-active" checked class="w-4 h-4 rounded border-stone-300 text-orange-500 focus:ring-orange-500">
+                    <label for="promo-active" class="text-sm font-medium text-stone-700">Активен</label>
+                </div>
+                <div class="flex flex-col-reverse md:flex-row justify-end pt-4 border-t border-stone-100 gap-3">
+                    <button type="button" onclick="closePromoForm()" class="px-5 py-2.5 text-stone-600 bg-stone-100 hover:bg-stone-200 rounded-xl transition-colors font-medium">Отмена</button>
+                    <button type="submit" class="px-5 py-2.5 text-white bg-orange-600 hover:bg-orange-500 rounded-xl font-medium transition-colors">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast notification -->
+    <div id="toast" class="fixed bottom-6 right-6 z-[200] hidden">
+        <div class="bg-stone-900 text-white px-5 py-3 rounded-xl shadow-xl text-sm font-medium flex items-center gap-2">
+            <i data-lucide="check-circle" class="w-4 h-4 text-green-400"></i>
+            <span id="toast-text">Сохранено!</span>
+        </div>
+    </div>
+
+<script>
+// ============================================================
+// CONFIG & STATE
+// ============================================================
+const API = 'api';
+let authToken = localStorage.getItem('youpechka_token') || '';
+let categories = [];
+let allMenuData = [];
+let deliveryZones = [];
+
+// ============================================================
+// API HELPER
+// ============================================================
+async function api(endpoint, options = {}) {
+    const headers = { 'Content-Type': 'application/json' };
+    if (authToken) headers['Authorization'] = 'Bearer ' + authToken;
+
+    const config = { headers, ...options };
+    if (options.body && typeof options.body === 'object' && !(options.body instanceof FormData)) {
+        config.body = JSON.stringify(options.body);
+    }
+    if (options.body instanceof FormData) {
+        delete config.headers['Content-Type'];
+    }
+
+    const res = await fetch(`${API}/${endpoint}`, config);
+    const data = await res.json();
+    if (!res.ok) {
+        if (res.status === 401) { authToken = ''; localStorage.removeItem('youpechka_token'); checkAuth(); }
+        throw new Error(data.error || 'Ошибка сервера');
+    }
+    return data;
+}
+
+function toast(msg) {
+    const el = document.getElementById('toast');
+    document.getElementById('toast-text').textContent = msg;
+    el.classList.remove('hidden');
+    setTimeout(() => el.classList.add('hidden'), 2500);
+}
+
+// ============================================================
+// AUTH
+// ============================================================
+function checkAuth() {
+    const isAuth = !!authToken;
+    document.getElementById('login-view').classList.toggle('hidden', isAuth);
+    document.getElementById('dashboard-view').classList.toggle('hidden', !isAuth);
+    document.getElementById('dashboard-view').style.display = isAuth ? 'flex' : 'none';
+    return isAuth;
+}
+
+async function login(e) {
+    e.preventDefault();
+    const btn = document.getElementById('login-btn');
+    const pwd = document.getElementById('password-input').value;
+    btn.disabled = true; btn.textContent = 'Вход...';
+    try {
+        const data = await api('login.php', { method: 'POST', body: { password: pwd } });
+        authToken = data.token;
+        localStorage.setItem('youpechka_token', authToken);
+        document.getElementById('password-input').value = '';
+        document.getElementById('login-error').classList.add('hidden');
+        initAdmin();
+    } catch (err) {
+        document.getElementById('login-error').classList.remove('hidden');
+    } finally {
+        btn.disabled = false; btn.textContent = 'Войти';
+    }
+}
+
+async function logout() {
+    try { await api('logout.php', { method: 'POST' }); } catch(e) {}
+    authToken = '';
+    localStorage.removeItem('youpechka_token');
+    checkAuth();
+}
+
+// ============================================================
+// INIT
+// ============================================================
+async function initAdmin() {
+    if (!checkAuth()) return;
+    lucide.createIcons();
+    switchTab('orders');
+    loadOrders();
+    loadMenuData();
+}
+
+document.addEventListener('DOMContentLoaded', initAdmin);
+
+// ============================================================
+// TABS
+// ============================================================
+const tabs = ['orders', 'menu', 'delivery', 'promos', 'analytics', 'settings'];
+
+function switchTab(tab) {
+    tabs.forEach(t => {
+        document.getElementById('view-' + t).classList.toggle('hidden', t !== tab);
+        const btn = document.getElementById('tab-' + t);
+        if (t === tab) {
+            btn.className = 'tab-btn whitespace-nowrap flex-1 md:flex-none flex items-center px-4 py-2.5 bg-orange-600 rounded-xl font-medium text-white text-sm shadow-sm';
+        } else {
+            btn.className = 'tab-btn whitespace-nowrap flex-1 md:flex-none flex items-center px-4 py-2.5 text-stone-400 hover:bg-stone-800 hover:text-white rounded-xl font-medium text-sm';
+        }
+    });
+    // Load tab data
+    if (tab === 'orders') loadOrders();
+    if (tab === 'menu') loadMenuData();
+    if (tab === 'delivery') loadDelivery();
+    if (tab === 'promos') loadPromos();
+    if (tab === 'analytics') loadAnalytics();
+    if (tab === 'settings') loadSettings();
+}
+
+// ============================================================
+// ORDERS
+// ============================================================
+async function loadOrders() {
+    try {
+        const status = document.getElementById('orders-filter').value;
+        let url = 'orders.php?limit=50';
+        if (status) url += '&status=' + status;
+        const data = await api(url);
+        renderOrders(data.orders || []);
+    } catch(e) { console.error('Orders error:', e); }
+}
+
+function renderOrders(orders) {
+    const container = document.getElementById('orders-container');
+    const badge = document.getElementById('orders-badge');
+
+    const active = orders.filter(o => o.status === 'new' || o.status === 'cooking').length;
+    if (active > 0) { badge.textContent = active; badge.classList.remove('hidden'); }
+    else { badge.classList.add('hidden'); }
+
+    if (orders.length === 0) {
+        container.innerHTML = `<div class="col-span-full text-center py-16 bg-white rounded-3xl border border-stone-200 shadow-sm">
+            <i data-lucide="inbox" class="w-16 h-16 text-stone-200 mx-auto mb-4"></i>
+            <h3 class="text-xl font-bold text-stone-400">Пока нет заказов</h3>
+            <p class="text-sm text-stone-400 mt-2">Когда клиент оформит заказ, он появится здесь.</p>
+        </div>`;
+        lucide.createIcons(); return;
+    }
+
+    const sc = {
+        'new': { color: 'bg-red-500 text-white', text: 'Новый' },
+        'cooking': { color: 'bg-yellow-500 text-white', text: 'Готовится' },
+        'ready': { color: 'bg-blue-500 text-white', text: 'Готов' },
+        'delivering': { color: 'bg-purple-500 text-white', text: 'Доставка' },
+        'done': { color: 'bg-green-500 text-white', text: 'Выдан' },
+        'canceled': { color: 'bg-stone-300 text-stone-600', text: 'Отменен' }
+    };
+
+    container.innerHTML = orders.map(order => {
+        const conf = sc[order.status] || sc['new'];
+        const items = (order.items || []).map(i => `
+            <div class="flex justify-between text-sm mb-1.5 last:mb-0">
+                <span class="text-stone-700"><span class="font-bold text-stone-900">${i.quantity} x</span> ${i.name}</span>
+                <span class="font-medium text-stone-900">${(i.price * i.quantity).toFixed(0)} ₽</span>
+            </div>`).join('');
+        const isInactive = order.status === 'done' || order.status === 'canceled';
+        const deliveryInfo = order.delivery_type === 'delivery'
+            ? `<div class="text-stone-600 flex items-center text-sm font-medium"><i data-lucide="truck" class="w-4 h-4 mr-2 text-stone-400"></i>${order.delivery_address || 'Доставка'}</div>`
+            : `<div class="text-stone-600 flex items-center text-sm font-medium"><i data-lucide="map-pin" class="w-4 h-4 mr-2 text-stone-400"></i>Самовывоз</div>`;
+        const discountLine = order.discount_amount > 0 ? `<div class="flex justify-between text-sm text-green-600"><span>Скидка (${order.promo_code})</span><span>-${parseFloat(order.discount_amount).toFixed(0)} ₽</span></div>` : '';
+        const deliveryFeeLine = order.delivery_fee > 0 ? `<div class="flex justify-between text-sm text-stone-500"><span>Доставка</span><span>+${parseFloat(order.delivery_fee).toFixed(0)} ₽</span></div>` : '';
+
+        let buttons = '';
+        if (order.status === 'new') buttons = `<button onclick="updateOrderStatus(${order.id},'cooking')" class="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2.5 rounded-xl transition-colors text-sm shadow-sm">Готовить</button>`;
+        if (order.status === 'cooking') buttons = `<button onclick="updateOrderStatus(${order.id},'ready')" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2.5 rounded-xl transition-colors text-sm shadow-sm">Готов</button>`;
+        if (order.status === 'ready') buttons = `<button onclick="updateOrderStatus(${order.id},'${order.delivery_type==='delivery'?'delivering':'done'}')" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-2.5 rounded-xl transition-colors text-sm shadow-sm">${order.delivery_type==='delivery'?'Отправить':'Выдать'}</button>`;
+        if (order.status === 'delivering') buttons = `<button onclick="updateOrderStatus(${order.id},'done')" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-2.5 rounded-xl transition-colors text-sm shadow-sm">Доставлен</button>`;
+        const cancelBtn = !isInactive ? `<button onclick="updateOrderStatus(${order.id},'canceled')" class="px-3 bg-stone-100 hover:bg-red-100 text-stone-500 hover:text-red-500 font-bold py-2.5 rounded-xl transition-colors text-sm" title="Отменить"><i data-lucide="x" class="w-4 h-4 mx-auto"></i></button>` : '';
+
+        return `<div class="bg-white rounded-3xl p-5 shadow-sm border border-stone-200 flex flex-col transition-opacity ${isInactive ? 'opacity-60 grayscale-[30%]' : ''}">
+            <div class="flex justify-between items-start mb-3">
+                <div>
+                    <h3 class="font-black text-lg text-stone-900">Заказ #${order.order_number}</h3>
+                    <p class="text-xs font-medium text-stone-400">${new Date(order.created_at).toLocaleString('ru-RU', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</p>
+                </div>
+                <span class="${conf.color} text-[10px] uppercase tracking-wider font-bold px-3 py-1.5 rounded-full shadow-sm">${conf.text}</span>
+            </div>
+            <div class="bg-stone-50 p-4 rounded-2xl mb-3 flex-grow border border-stone-100">
+                <div class="mb-3 pb-3 border-b border-stone-200">
+                    <div class="font-bold flex items-center mb-1 text-stone-800 text-sm"><i data-lucide="user" class="w-4 h-4 mr-2 text-stone-400"></i>${order.customer_name}</div>
+                    <div class="text-stone-600 flex items-center text-sm font-medium"><i data-lucide="phone" class="w-4 h-4 mr-2 text-stone-400"></i><a href="tel:${order.customer_phone}" class="hover:text-blue-500">${order.customer_phone}</a></div>
+                    ${deliveryInfo}
+                </div>
+                <div class="mb-2">
+                    <p class="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-2">Состав</p>
+                    ${items}
+                </div>
+                ${discountLine}${deliveryFeeLine}
+                <div class="flex justify-between items-center mt-3 pt-3 border-t border-stone-200">
+                    <span class="font-bold text-stone-400 uppercase text-xs tracking-wider">Итого</span>
+                    <span class="font-black text-2xl text-orange-600">${parseFloat(order.total).toFixed(0)} ₽</span>
+                </div>
+            </div>
+            <div class="flex gap-2 mt-auto">${buttons}${cancelBtn}</div>
+        </div>`;
+    }).join('');
+    lucide.createIcons();
+}
+
+async function updateOrderStatus(id, status) {
+    try {
+        await api('orders.php?id=' + id, { method: 'PUT', body: { status } });
+        loadOrders();
+        toast('Статус обновлен');
+    } catch(e) { alert('Ошибка: ' + e.message); }
+}
+
+// ============================================================
+// MENU
+// ============================================================
+async function loadMenuData() {
+    try {
+        const [menuData, catData] = await Promise.all([
+            api('menu.php?admin=1'),
+            api('categories.php')
+        ]);
+        categories = catData.categories || [];
+        allMenuData = [];
+        (menuData.categories || []).forEach(cat => {
+            (cat.items || []).forEach(item => {
+                item.category_name = cat.name;
+                item.category_id = item.category_id || cat.id;
+                allMenuData.push(item);
             });
-            lucide.createIcons();
-        }
+        });
+        renderMenuTable();
+        populateCategorySelect();
+    } catch(e) { console.error('Menu error:', e); }
+}
 
-        function changeOrderStatus(id, newStatus) {
-            const order = mockOrders.find(o => o.id === id);
-            if (order) {
-                order.status = newStatus;
-                localStorage.setItem('youpechka_orders', JSON.stringify(mockOrders)); // Сохраняем статус
-                renderOrders();
+function renderMenuTable() {
+    const tbody = document.getElementById('menu-table');
+    if (allMenuData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-stone-400">Меню пусто. Добавьте первую позицию!</td></tr>';
+        return;
+    }
+    const defImg = 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=500';
+    tbody.innerHTML = allMenuData.map(item => `
+        <tr class="hover:bg-stone-50 transition-colors">
+            <td class="p-4"><img src="${item.image || defImg}" onerror="this.src='${defImg}'" class="w-12 h-12 object-cover rounded-xl border border-stone-200 shadow-sm"></td>
+            <td class="p-4">
+                <div class="font-bold text-stone-900">${item.name}</div>
+                ${item.size ? `<div class="text-xs text-stone-500 mt-0.5">${item.size}</div>` : ''}
+            </td>
+            <td class="p-4 text-sm text-stone-500"><span class="bg-stone-100 px-2 py-1 rounded-md font-medium border border-stone-200/50">${item.category_name || ''}</span></td>
+            <td class="p-4 font-black text-orange-600 whitespace-nowrap text-lg">${item.price} ₽</td>
+            <td class="p-4 text-center">
+                <span class="text-xs font-medium px-2 py-1 rounded-full ${item.is_active !== 0 ? 'bg-green-100 text-green-700' : 'bg-stone-100 text-stone-500'}">${item.is_active !== 0 ? 'Активно' : 'Скрыто'}</span>
+            </td>
+            <td class="p-4 text-right">
+                <div class="flex justify-end space-x-1">
+                    <button onclick="openMenuForm(${item.id})" class="text-blue-500 p-2 hover:bg-blue-50 rounded-xl transition-colors"><i data-lucide="edit" class="w-4 h-4"></i></button>
+                    <button onclick="deleteMenuItem(${item.id})" class="text-red-500 p-2 hover:bg-red-50 rounded-xl transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                </div>
+            </td>
+        </tr>`).join('');
+    lucide.createIcons();
+}
+
+function populateCategorySelect() {
+    const sel = document.getElementById('item-category');
+    sel.innerHTML = categories.filter(c => c.is_active != 0).map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+}
+
+function openMenuForm(id = null) {
+    document.getElementById('menu-form').reset();
+    document.getElementById('item-id').value = '';
+    populateCategorySelect();
+    if (id) {
+        const item = allMenuData.find(i => i.id === id);
+        if (!item) return;
+        document.getElementById('item-id').value = item.id;
+        document.getElementById('item-name').value = item.name;
+        document.getElementById('item-category').value = item.category_id;
+        document.getElementById('item-price').value = item.price;
+        document.getElementById('item-size').value = item.size || '';
+        document.getElementById('item-tags').value = (item.tags || []).join(', ');
+        document.getElementById('item-desc').value = item.description || '';
+        document.getElementById('item-img').value = item.image || '';
+        document.getElementById('menu-modal-title').textContent = 'Редактировать блюдо';
+    } else {
+        document.getElementById('menu-modal-title').textContent = 'Добавить блюдо';
+    }
+    document.getElementById('menu-modal').classList.remove('hidden');
+    lucide.createIcons();
+}
+
+function closeMenuForm() { document.getElementById('menu-modal').classList.add('hidden'); }
+
+async function saveMenuItem(e) {
+    e.preventDefault();
+    const id = document.getElementById('item-id').value;
+    const tagsStr = document.getElementById('item-tags').value;
+    const body = {
+        name: document.getElementById('item-name').value,
+        category_id: parseInt(document.getElementById('item-category').value),
+        price: parseInt(document.getElementById('item-price').value),
+        size: document.getElementById('item-size').value,
+        tags: tagsStr.split(',').map(t => t.trim()).filter(t => t),
+        description: document.getElementById('item-desc').value,
+        image: document.getElementById('item-img').value
+    };
+
+    try {
+        if (id) {
+            await api('menu.php?id=' + id, { method: 'PUT', body });
+        } else {
+            await api('menu.php', { method: 'POST', body });
+        }
+        closeMenuForm();
+        loadMenuData();
+        toast('Блюдо сохранено');
+    } catch(e) { alert('Ошибка: ' + e.message); }
+}
+
+async function deleteMenuItem(id) {
+    if (!confirm('Удалить эту позицию из меню?')) return;
+    try {
+        await api('menu.php?id=' + id, { method: 'DELETE' });
+        loadMenuData();
+        toast('Позиция удалена');
+    } catch(e) { alert('Ошибка: ' + e.message); }
+}
+
+async function uploadImage(input) {
+    if (!input.files[0]) return;
+    const fd = new FormData();
+    fd.append('image', input.files[0]);
+    try {
+        const data = await api('upload.php', { method: 'POST', body: fd });
+        document.getElementById('item-img').value = data.url;
+        toast('Фото загружено');
+    } catch(e) { alert('Ошибка загрузки: ' + e.message); }
+}
+
+// ============================================================
+// CATEGORIES
+// ============================================================
+function openCategoryModal() {
+    renderCategoriesList();
+    document.getElementById('category-modal').classList.remove('hidden');
+    lucide.createIcons();
+}
+function closeCategoryModal() { document.getElementById('category-modal').classList.add('hidden'); }
+
+function renderCategoriesList() {
+    const el = document.getElementById('categories-list');
+    if (categories.length === 0) { el.innerHTML = '<p class="text-stone-400 text-sm text-center py-2">Нет категорий</p>'; return; }
+    el.innerHTML = categories.map(c => `
+        <div class="flex items-center justify-between bg-stone-50 px-3 py-2 rounded-xl">
+            <span class="font-medium text-sm ${c.is_active == 0 ? 'line-through text-stone-400' : ''}">${c.name}</span>
+            <button onclick="deleteCategory(${c.id})" class="text-red-400 hover:text-red-600 p-1"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
+        </div>`).join('');
+    lucide.createIcons();
+}
+
+async function addCategory() {
+    const name = document.getElementById('new-category-name').value.trim();
+    if (!name) return;
+    try {
+        await api('categories.php', { method: 'POST', body: { name } });
+        document.getElementById('new-category-name').value = '';
+        const catData = await api('categories.php');
+        categories = catData.categories || [];
+        renderCategoriesList();
+        toast('Категория добавлена');
+    } catch(e) { alert('Ошибка: ' + e.message); }
+}
+
+async function deleteCategory(id) {
+    if (!confirm('Удалить категорию?')) return;
+    try {
+        await api('categories.php?id=' + id, { method: 'DELETE' });
+        const catData = await api('categories.php');
+        categories = catData.categories || [];
+        renderCategoriesList();
+        toast('Категория удалена');
+    } catch(e) { alert('Ошибка: ' + e.message); }
+}
+
+// ============================================================
+// DELIVERY
+// ============================================================
+async function loadDelivery() {
+    try {
+        const data = await api('delivery.php');
+        document.getElementById('delivery-enabled').checked = data.delivery_enabled == 1 || data.delivery_enabled === true;
+        document.getElementById('pickup-address').value = data.pickup_address || '';
+        document.getElementById('min-order-amount').value = data.min_order_amount || '';
+        deliveryZones = data.zones || [];
+        renderDeliveryZones();
+    } catch(e) { console.error('Delivery error:', e); }
+}
+
+function renderDeliveryZones() {
+    const el = document.getElementById('delivery-zones');
+    if (deliveryZones.length === 0) {
+        el.innerHTML = '<p class="text-stone-400 text-sm text-center py-4">Нет зон доставки</p>';
+        return;
+    }
+    el.innerHTML = deliveryZones.map((z, i) => `
+        <div class="flex items-center gap-3 bg-stone-50 p-3 rounded-xl border border-stone-100">
+            <input type="text" value="${z.name}" onchange="deliveryZones[${i}].name=this.value" class="flex-1 px-3 py-2 border border-stone-200 rounded-lg outline-none text-sm focus:ring-2 focus:ring-orange-500" placeholder="Название зоны">
+            <input type="number" value="${z.delivery_fee}" onchange="deliveryZones[${i}].delivery_fee=this.value" class="w-24 px-3 py-2 border border-stone-200 rounded-lg outline-none text-sm focus:ring-2 focus:ring-orange-500" placeholder="Цена">
+            <span class="text-xs text-stone-400">₽</span>
+            <input type="number" value="${z.min_order || 0}" onchange="deliveryZones[${i}].min_order=this.value" class="w-24 px-3 py-2 border border-stone-200 rounded-lg outline-none text-sm focus:ring-2 focus:ring-orange-500" placeholder="Мин. заказ">
+            <button onclick="deliveryZones.splice(${i},1);renderDeliveryZones()" class="text-red-400 hover:text-red-600 p-1 flex-shrink-0"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+        </div>`).join('');
+    lucide.createIcons();
+}
+
+function addDeliveryZone() {
+    deliveryZones.push({ name: '', delivery_fee: 0, min_order: 0 });
+    renderDeliveryZones();
+}
+
+async function saveDelivery() {
+    try {
+        await api('delivery.php', { method: 'POST', body: {
+            delivery_enabled: document.getElementById('delivery-enabled').checked,
+            pickup_address: document.getElementById('pickup-address').value,
+            min_order_amount: parseFloat(document.getElementById('min-order-amount').value) || 0,
+            zones: deliveryZones
+        }});
+        toast('Настройки доставки сохранены');
+    } catch(e) { alert('Ошибка: ' + e.message); }
+}
+
+// ============================================================
+// PROMOS
+// ============================================================
+async function loadPromos() {
+    try {
+        const data = await api('promos.php');
+        renderPromos(data.promos || []);
+    } catch(e) { console.error('Promos error:', e); }
+}
+
+function renderPromos(promos) {
+    const tbody = document.getElementById('promos-table');
+    if (promos.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="p-8 text-center text-stone-400">Нет промокодов</td></tr>';
+        return;
+    }
+    tbody.innerHTML = promos.map(p => {
+        const disc = p.discount_type === 'percent' ? p.discount_value + '%' : p.discount_value + ' ₽';
+        const uses = (p.max_uses ? `${p.used_count}/${p.max_uses}` : p.used_count + ' (безлим.)');
+        let period = '-';
+        if (p.valid_from && p.valid_until) period = `${formatDate(p.valid_from)} — ${formatDate(p.valid_until)}`;
+        else if (p.valid_from) period = `с ${formatDate(p.valid_from)}`;
+        else if (p.valid_until) period = `до ${formatDate(p.valid_until)}`;
+
+        return `<tr class="hover:bg-stone-50 transition-colors">
+            <td class="p-4 font-mono font-bold text-sm">${p.code}</td>
+            <td class="p-4 font-medium">${disc}</td>
+            <td class="p-4 text-sm text-stone-500">${p.min_order > 0 ? p.min_order + ' ₽' : '-'}</td>
+            <td class="p-4 text-sm">${uses}</td>
+            <td class="p-4 text-xs text-stone-500">${period}</td>
+            <td class="p-4 text-center"><span class="text-xs font-medium px-2 py-1 rounded-full ${p.is_active == 1 ? 'bg-green-100 text-green-700' : 'bg-stone-100 text-stone-500'}">${p.is_active == 1 ? 'Активен' : 'Выключен'}</span></td>
+            <td class="p-4 text-right">
+                <div class="flex justify-end space-x-1">
+                    <button onclick="openPromoForm(${p.id})" class="text-blue-500 p-2 hover:bg-blue-50 rounded-xl"><i data-lucide="edit" class="w-4 h-4"></i></button>
+                    <button onclick="deletePromo(${p.id})" class="text-red-500 p-2 hover:bg-red-50 rounded-xl"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                </div>
+            </td>
+        </tr>`;
+    }).join('');
+    lucide.createIcons();
+}
+
+function formatDate(d) { if (!d) return ''; return new Date(d).toLocaleDateString('ru-RU', {day:'numeric',month:'short',year:'2-digit'}); }
+
+let allPromos = [];
+async function openPromoForm(id = null) {
+    document.getElementById('promo-form').reset();
+    document.getElementById('promo-id').value = '';
+    document.getElementById('promo-active').checked = true;
+    if (id) {
+        try {
+            const data = await api('promos.php');
+            allPromos = data.promos || [];
+            const p = allPromos.find(x => x.id === id);
+            if (p) {
+                document.getElementById('promo-id').value = p.id;
+                document.getElementById('promo-code').value = p.code;
+                document.getElementById('promo-type').value = p.discount_type;
+                document.getElementById('promo-value').value = p.discount_value;
+                document.getElementById('promo-min').value = p.min_order || '';
+                document.getElementById('promo-max-uses').value = p.max_uses || '';
+                document.getElementById('promo-active').checked = p.is_active == 1;
+                if (p.valid_from) document.getElementById('promo-from').value = p.valid_from.slice(0,10);
+                if (p.valid_until) document.getElementById('promo-until').value = p.valid_until.slice(0,10);
             }
-        }
+        } catch(e) {}
+        document.getElementById('promo-modal-title').textContent = 'Редактировать промокод';
+    } else {
+        document.getElementById('promo-modal-title').textContent = 'Новый промокод';
+    }
+    document.getElementById('promo-modal').classList.remove('hidden');
+    lucide.createIcons();
+}
 
+function closePromoForm() { document.getElementById('promo-modal').classList.add('hidden'); }
 
-        // --- MENU LOGIC ---
-        function renderTable() {
-            const tbody = document.getElementById('menu-table');
-            if (menuItems.length === 0) {
-                tbody.innerHTML = `<tr><td colSpan="5" class="p-8 text-center text-stone-400">Меню пусто. Добавьте первую позицию!</td></tr>`;
-                return;
-            }
-            
-            tbody.innerHTML = menuItems.map(item => {
-                const defaultImg = 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=500';
-                const imgUrl = item.img || defaultImg;
-                
-                return `
-                <tr class="hover:bg-stone-50 transition-colors">
-                    <td class="p-4">
-                        <img src="${imgUrl}" onerror="this.src='${defaultImg}'" class="w-12 h-12 md:w-16 md:h-16 object-cover rounded-xl border border-stone-200 shadow-sm">
-                    </td>
-                    <td class="p-4">
-                        <div class="font-bold text-stone-900">${item.name}</div>
-                        ${item.size ? `<div class="text-xs text-stone-500 mt-1">${item.size}</div>` : ''}
-                    </td>
-                    <td class="p-4 text-xs md:text-sm text-stone-500">
-                        <span class="bg-stone-100 px-2 py-1 rounded-md font-medium border border-stone-200/50">${item.category}</span>
-                    </td>
-                    <td class="p-4 font-black text-orange-600 whitespace-nowrap text-lg">${item.price} ₽</td>
-                    <td class="p-4 text-right">
-                        <div class="flex justify-end space-x-1 md:space-x-2">
-                            <button onclick="openForm(${item.id})" class="text-blue-500 p-2 md:p-3 hover:bg-blue-50 rounded-xl transition-colors" title="Редактировать"><i data-lucide="edit" class="w-4 h-4 md:w-5 md:h-5"></i></button>
-                            <button onclick="deleteItem(${item.id})" class="text-red-500 p-2 md:p-3 hover:bg-red-50 rounded-xl transition-colors" title="Удалить"><i data-lucide="trash-2" class="w-4 h-4 md:w-5 md:h-5"></i></button>
-                        </div>
-                    </td>
-                </tr>
-            `}).join('');
-            lucide.createIcons();
-        }
+async function savePromo(e) {
+    e.preventDefault();
+    const id = document.getElementById('promo-id').value;
+    const body = {
+        code: document.getElementById('promo-code').value,
+        discount_type: document.getElementById('promo-type').value,
+        discount_value: parseFloat(document.getElementById('promo-value').value),
+        min_order: parseFloat(document.getElementById('promo-min').value) || 0,
+        max_uses: parseInt(document.getElementById('promo-max-uses').value) || null,
+        is_active: document.getElementById('promo-active').checked ? 1 : 0,
+        valid_from: document.getElementById('promo-from').value || null,
+        valid_until: document.getElementById('promo-until').value || null
+    };
+    if (id) body.id = parseInt(id);
 
-        function openForm(id = null) {
-            document.getElementById('item-form').reset();
-            if (id) {
-                const item = menuItems.find(i => i.id === id);
-                document.getElementById('item-id').value = item.id;
-                document.getElementById('item-name').value = item.name;
-                document.getElementById('item-category').value = item.category;
-                document.getElementById('item-price').value = item.price;
-                document.getElementById('item-size').value = item.size || '';
-                document.getElementById('item-tags').value = (item.tags || []).join(', ');
-                document.getElementById('item-desc').value = item.desc || '';
-                document.getElementById('item-img').value = item.img || '';
-                document.getElementById('modal-title').textContent = 'Редактировать позицию';
-            } else {
-                document.getElementById('item-id').value = '';
-                document.getElementById('modal-title').textContent = 'Добавить позицию';
-            }
-            document.getElementById('form-modal').classList.remove('hidden');
-        }
+    try {
+        await api('promos.php', { method: 'POST', body });
+        closePromoForm();
+        loadPromos();
+        toast('Промокод сохранен');
+    } catch(e) { alert('Ошибка: ' + e.message); }
+}
 
-        function closeForm() { 
-            document.getElementById('form-modal').classList.add('hidden'); 
-        }
+async function deletePromo(id) {
+    if (!confirm('Удалить промокод?')) return;
+    try {
+        await api('promos.php?id=' + id, { method: 'DELETE' });
+        loadPromos();
+        toast('Промокод удален');
+    } catch(e) { alert('Ошибка: ' + e.message); }
+}
 
-        function saveItem(e) {
-            e.preventDefault();
-            const idVal = document.getElementById('item-id').value;
-            const tagsInput = document.getElementById('item-tags').value;
-            
-            const newItem = {
-                id: idVal ? parseInt(idVal) : Date.now(),
-                name: document.getElementById('item-name').value,
-                category: document.getElementById('item-category').value,
-                price: parseInt(document.getElementById('item-price').value),
-                size: document.getElementById('item-size').value,
-                tags: tagsInput.split(',').map(t => t.trim()).filter(t => t !== ''),
-                desc: document.getElementById('item-desc').value,
-                img: document.getElementById('item-img').value
-            };
+// ============================================================
+// ANALYTICS
+// ============================================================
+async function loadAnalytics() {
+    try {
+        const period = document.getElementById('analytics-period').value;
+        const data = await api('analytics.php?period=' + period);
+        renderAnalytics(data);
+    } catch(e) { console.error('Analytics error:', e); }
+}
 
-            if (idVal) {
-                const idx = menuItems.findIndex(i => i.id === newItem.id);
-                menuItems[idx] = newItem;
-            } else {
-                menuItems.push(newItem);
-            }
-            
-            localStorage.setItem('youpechka_menu', JSON.stringify(menuItems)); // Сохраняем в память!
-            renderTable();
-            closeForm();
-        }
+function renderAnalytics(data) {
+    const s = data.summary || {};
+    document.getElementById('stat-orders').textContent = s.total_orders || 0;
+    document.getElementById('stat-revenue').textContent = (parseFloat(s.total_revenue) || 0).toLocaleString('ru-RU') + ' ₽';
+    document.getElementById('stat-avg').textContent = (parseFloat(s.avg_order_value) || 0).toFixed(0) + ' ₽';
+    document.getElementById('stat-canceled').textContent = s.canceled_count || 0;
 
-        function deleteItem(id) {
-            if(confirm('Точно удалить эту позицию из меню?')) {
-                menuItems = menuItems.filter(i => i.id !== id);
-                localStorage.setItem('youpechka_menu', JSON.stringify(menuItems)); // Сохраняем в память!
-                renderTable();
-            }
-        }
+    // Daily chart (bar chart via CSS)
+    const daily = data.daily_chart || [];
+    const maxRev = Math.max(...daily.map(d => d.revenue), 1);
+    document.getElementById('chart-daily').innerHTML = daily.length === 0
+        ? '<p class="text-stone-400 text-sm text-center py-4">Нет данных</p>'
+        : daily.map(d => `
+            <div class="flex items-center gap-3 text-sm">
+                <span class="w-16 text-stone-500 text-xs flex-shrink-0">${formatDate(d.date)}</span>
+                <div class="flex-1 bg-stone-100 rounded-full h-6 overflow-hidden">
+                    <div class="bg-orange-500 h-full rounded-full flex items-center px-2" style="width:${Math.max((d.revenue/maxRev)*100, 2)}%">
+                        <span class="text-white text-xs font-bold whitespace-nowrap">${d.revenue.toLocaleString('ru-RU')} ₽</span>
+                    </div>
+                </div>
+                <span class="text-stone-400 text-xs w-10 text-right">${d.orders} шт</span>
+            </div>`).join('');
 
-        function saveSettings(e) {
-            e.preventDefault();
-            const token = document.getElementById('bot-token').value;
-            const chatId = document.getElementById('chat-id').value;
-            localStorage.setItem('youpechka_settings', JSON.stringify({ botToken: token, chatId: chatId }));
-            alert(`Настройки бота сохранены!`);
-        }
-    </script>
+    // Popular items
+    const popular = data.popular_items || [];
+    const maxQty = Math.max(...popular.map(p => p.quantity_sold), 1);
+    document.getElementById('chart-popular').innerHTML = popular.length === 0
+        ? '<p class="text-stone-400 text-sm text-center py-4">Нет данных</p>'
+        : popular.map(p => `
+            <div class="flex items-center gap-3 text-sm">
+                <span class="w-32 font-medium text-stone-800 truncate flex-shrink-0">${p.name}</span>
+                <div class="flex-1 bg-stone-100 rounded-full h-5 overflow-hidden">
+                    <div class="bg-stone-700 h-full rounded-full" style="width:${Math.max((p.quantity_sold/maxQty)*100, 2)}%"></div>
+                </div>
+                <span class="text-stone-500 text-xs w-20 text-right">${p.quantity_sold} шт / ${parseFloat(p.revenue).toLocaleString('ru-RU')} ₽</span>
+            </div>`).join('');
+
+    // Status breakdown
+    const statuses = data.orders_by_status || {};
+    const statusLabels = { new: 'Новые', cooking: 'Готовятся', ready: 'Готовы', delivering: 'Доставка', done: 'Выданы', canceled: 'Отменены' };
+    const statusColors = { new: 'bg-red-100 text-red-700', cooking: 'bg-yellow-100 text-yellow-700', ready: 'bg-blue-100 text-blue-700', delivering: 'bg-purple-100 text-purple-700', done: 'bg-green-100 text-green-700', canceled: 'bg-stone-100 text-stone-600' };
+    document.getElementById('status-breakdown').innerHTML = Object.entries(statusLabels).map(([k, label]) => `
+        <div class="${statusColors[k]} p-4 rounded-xl text-center">
+            <p class="text-2xl font-black">${statuses[k] || 0}</p>
+            <p class="text-xs font-medium mt-1">${label}</p>
+        </div>`).join('');
+}
+
+// ============================================================
+// SETTINGS
+// ============================================================
+async function loadSettings() {
+    try {
+        const data = await api('settings.php');
+        const s = data.settings || {};
+        document.getElementById('bot-token').value = s.telegram_bot_token || '';
+        document.getElementById('chat-id').value = s.telegram_chat_id || '';
+        document.getElementById('restaurant-phone').value = s.restaurant_phone || '';
+        document.getElementById('working-hours').value = s.working_hours || '';
+    } catch(e) { console.error('Settings error:', e); }
+}
+
+async function saveSettings() {
+    const body = {
+        telegram_bot_token: document.getElementById('bot-token').value,
+        telegram_chat_id: document.getElementById('chat-id').value,
+        restaurant_phone: document.getElementById('restaurant-phone').value,
+        working_hours: document.getElementById('working-hours').value
+    };
+    const newPwd = document.getElementById('new-password').value;
+    if (newPwd) body.new_password = newPwd;
+
+    try {
+        await api('settings.php', { method: 'POST', body });
+        document.getElementById('new-password').value = '';
+        toast('Настройки сохранены');
+    } catch(e) { alert('Ошибка: ' + e.message); }
+}
+
+async function testTelegram() {
+    try {
+        const data = await api('settings.php', { method: 'POST', body: {
+            telegram_bot_token: document.getElementById('bot-token').value,
+            telegram_chat_id: document.getElementById('chat-id').value,
+            test_telegram: true
+        }});
+        if (data.telegram_test === 'ok') toast('Тестовое сообщение отправлено!');
+        else alert('Ошибка: ' + (data.telegram_error || 'Не удалось отправить'));
+    } catch(e) { alert('Ошибка: ' + e.message); }
+}
+
+// Auto-refresh orders every 30 seconds
+setInterval(() => {
+    if (authToken && !document.getElementById('view-orders').classList.contains('hidden')) {
+        loadOrders();
+    }
+}, 30000);
+</script>
 </body>
 </html>
