@@ -9,18 +9,32 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <style> body { font-family: 'Inter', sans-serif; background-color: #f5f5f4; } </style>
 </head>
-<body class="text-stone-800 antialiased h-screen flex overflow-hidden">
+<body class="text-stone-800 antialiased h-screen flex overflow-hidden bg-stone-100">
 
-    <!-- Sidebar -->
-    <aside class="w-64 bg-stone-900 text-white flex flex-col h-full flex-shrink-0">
-        <div class="p-6 border-b border-stone-800 flex items-center space-x-3">
-            <!-- ЛОГОТИП -->
-            <img src="logo.jpg" alt="You Печка" onerror="this.src='https://placehold.co/100x100/C68663/FFF?text=YP'" class="w-12 h-12 rounded-full object-cover border-2 border-stone-700">
-            <div>
-                <h1 class="text-lg font-black uppercase tracking-widest text-orange-500 leading-none">You Печка</h1>
-                <span class="text-xs text-stone-400 font-medium">Админ-панель</span>
-            </div>
+    <!-- ЭКРАН ВХОДА В АДМИНКУ -->
+    <div id="login-view" class="w-full h-full flex flex-col items-center justify-center p-4 z-50 absolute inset-0 bg-stone-100">
+        <div class="bg-white p-8 rounded-3xl shadow-xl max-w-sm w-full border border-stone-200 text-center">
+            <img src="logo.jpg" onerror="this.src='https://placehold.co/100x100/C68663/FFF?text=YP'" class="w-24 h-24 rounded-full mx-auto mb-4 border-4 border-stone-50 object-cover shadow-sm">
+            <h2 class="text-2xl font-black text-stone-900 uppercase tracking-widest mb-1">You Печка</h2>
+            <p class="text-stone-500 mb-8 text-sm font-medium">Вход в панель управления</p>
+            
+            <form onsubmit="login(event)" class="space-y-4">
+                <div>
+                    <input type="password" id="password-input" required placeholder="Введите пароль" class="w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-orange-500 outline-none text-center tracking-widest font-mono transition-shadow">
+                    <p id="login-error" class="text-red-500 text-xs mt-2 hidden font-medium">Неверный пароль!</p>
+                </div>
+                <button type="submit" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-bold py-3 rounded-xl transition-colors shadow-md">
+                    Войти
+                </button>
+            </form>
         </div>
+    </div>
+
+    <!-- ОСНОВНАЯ АДМИН-ПАНЕЛЬ -->
+    <div id="dashboard-view" class="w-full h-full flex hidden">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-stone-900 text-white flex flex-col h-full flex-shrink-0">
+            <div class="p-6 border-b border-stone-800 flex items-center space-x-3">
         <nav class="flex-grow p-4 space-y-2">
             <button onclick="switchTab('orders')" id="tab-orders" class="w-full flex items-center px-4 py-3 bg-orange-600 rounded-xl font-medium text-white transition-colors">
                 <i data-lucide="bell" class="w-5 h-5 mr-3"></i> Заказы
@@ -33,10 +47,13 @@
                 <i data-lucide="settings" class="w-5 h-5 mr-3"></i> Настройки бота
             </button>
         </nav>
-        <div class="p-4 border-t border-stone-800">
+        <div class="p-4 border-t border-stone-800 space-y-2">
             <a href="client.html" target="_blank" class="w-full flex items-center justify-center px-4 py-3 bg-stone-800 hover:bg-stone-700 rounded-xl transition-colors text-sm font-medium">
                 <i data-lucide="external-link" class="w-4 h-4 mr-2"></i> Открыть сайт
             </a>
+            <button onclick="logout()" class="w-full flex items-center justify-center px-4 py-3 text-stone-400 hover:text-red-400 hover:bg-red-400/10 rounded-xl transition-colors text-sm font-medium">
+                <i data-lucide="log-out" class="w-4 h-4 mr-2"></i> Выйти
+            </button>
         </div>
     </aside>
 
@@ -170,8 +187,46 @@
             </div>
         </div>
     </main>
+    </div>
 
     <script>
+        // --- AUTH LOGIC (СИСТЕМА ВХОДА) ---
+        const ADMIN_PASSWORD = "admin"; // <--- ЗДЕСЬ МОЖНО ИЗМЕНИТЬ ПАРОЛЬ!
+
+        function checkAuth() {
+            // Проверяем, залогинен ли пользователь (данные сохраняются в сессии браузера)
+            const isAuth = sessionStorage.getItem('youpechka_auth') === 'true';
+            document.getElementById('login-view').classList.toggle('hidden', isAuth);
+            document.getElementById('dashboard-view').classList.toggle('hidden', !isAuth);
+            return isAuth;
+        }
+
+        function login(e) {
+            e.preventDefault();
+            const pwd = document.getElementById('password-input').value;
+            if (pwd === ADMIN_PASSWORD) {
+                // Если пароль верный, сохраняем статус
+                sessionStorage.setItem('youpechka_auth', 'true');
+                document.getElementById('password-input').value = '';
+                document.getElementById('login-error').classList.add('hidden');
+                
+                if (checkAuth()) {
+                    renderTable();
+                    renderOrders();
+                    switchTab('orders');
+                }
+            } else {
+                // Ошибка при неверном пароле
+                document.getElementById('login-error').classList.remove('hidden');
+            }
+        }
+
+        function logout() {
+            // Удаляем статус авторизации и обновляем экран
+            sessionStorage.removeItem('youpechka_auth');
+            checkAuth();
+        }
+
         // --- ДАННЫЕ ЗАКАЗОВ (Макет) ---
         let mockOrders = [
             {
@@ -208,9 +263,13 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
-            renderTable();
-            renderOrders();
-            switchTab('orders'); // Открываем заказы по умолчанию
+            
+            // Загружаем данные только если ввели верный пароль
+            if (checkAuth()) {
+                renderTable();
+                renderOrders();
+                switchTab('orders'); // Открываем заказы по умолчанию
+            }
         });
 
         // --- TABS LOGIC ---
