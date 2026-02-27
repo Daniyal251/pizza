@@ -348,6 +348,44 @@
                     </div>
                 </div>
 
+                <!-- Онлайн-оплата (ЮKassa) -->
+                <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-stone-200 mb-6">
+                    <div class="flex items-start gap-4 mb-6 pb-6 border-b border-stone-100">
+                        <div class="w-12 h-12 bg-violet-100 text-violet-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="credit-card" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold mb-1">Онлайн-оплата</h3>
+                            <p class="text-stone-500 text-sm">Подключите ЮKassa для приёма оплаты картой. <a href="https://yookassa.ru" target="_blank" class="text-violet-500 underline">yookassa.ru</a></p>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between pb-4 border-b border-stone-100">
+                            <div>
+                                <h4 class="font-bold">Приём оплаты картой</h4>
+                                <p class="text-stone-500 text-xs">Клиенты смогут оплатить заказ онлайн (карта, SBP, ЮMoney)</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="payment-online-enabled" class="sr-only peer">
+                                <div class="w-11 h-6 bg-stone-300 peer-focus:ring-2 peer-focus:ring-violet-500 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-violet-500"></div>
+                            </label>
+                        </div>
+                        <div>
+                            <label class="block font-medium text-stone-700 mb-2 text-sm">Shop ID</label>
+                            <input type="text" id="yookassa-shop-id" class="w-full px-4 py-3 border border-stone-200 rounded-xl outline-none focus:ring-2 focus:ring-violet-500 text-sm font-mono" placeholder="123456">
+                        </div>
+                        <div>
+                            <label class="block font-medium text-stone-700 mb-2 text-sm">Секретный ключ</label>
+                            <input type="password" id="yookassa-secret-key" class="w-full px-4 py-3 border border-stone-200 rounded-xl outline-none focus:ring-2 focus:ring-violet-500 text-sm font-mono" placeholder="live_...">
+                            <p class="text-xs text-stone-400 mt-2">Получите в <a href="https://yookassa.ru/my/shop-settings" target="_blank" class="text-violet-500 hover:underline">личном кабинете ЮKassa</a> → Настройки → Ключи API</p>
+                        </div>
+                        <div class="bg-amber-50 text-amber-800 text-xs p-3 rounded-xl border border-amber-200">
+                            <strong>Webhook URL:</strong> <code class="bg-amber-100 px-1.5 py-0.5 rounded font-mono">https://youpechka.ru/api/payment.php?action=webhook</code><br>
+                            Укажите этот адрес в личном кабинете ЮKassa → HTTP-уведомления
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Change password -->
                 <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-stone-200 mb-6">
                     <h3 class="text-xl font-bold mb-6">Смена пароля</h3>
@@ -672,8 +710,12 @@ function renderOrders(orders) {
         const deliveryInfo = order.delivery_type === 'delivery'
             ? `<div class="text-stone-600 flex items-center text-sm font-medium"><i data-lucide="truck" class="w-4 h-4 mr-2 text-stone-400"></i>${order.delivery_address || 'Доставка'}</div>`
             : `<div class="text-stone-600 flex items-center text-sm font-medium"><i data-lucide="map-pin" class="w-4 h-4 mr-2 text-stone-400"></i>Самовывоз</div>`;
-        const paymentLabels = { cash: 'Наличные' };
-        const paymentInfo = `<div class="text-stone-600 flex items-center text-sm font-medium"><i data-lucide="banknote" class="w-4 h-4 mr-2 text-stone-400"></i>${paymentLabels[order.payment_method] || 'Наличные'}</div>`;
+        const paymentLabels = { cash: 'Наличные', card: 'Картой' };
+        const paymentIcons = { cash: 'banknote', card: 'credit-card' };
+        const psColors = { paid: 'text-green-600', pending: 'text-amber-600', failed: 'text-red-600', refunded: 'text-violet-600' };
+        const psLabels = { paid: 'оплачен', pending: 'ожидает оплаты', failed: 'не оплачен', refunded: 'возврат' };
+        const ps = order.payment_status || (order.payment_method === 'cash' ? 'paid' : 'pending');
+        const paymentInfo = `<div class="text-stone-600 flex items-center text-sm font-medium"><i data-lucide="${paymentIcons[order.payment_method] || 'banknote'}" class="w-4 h-4 mr-2 text-stone-400"></i>${paymentLabels[order.payment_method] || 'Наличные'} <span class="${psColors[ps] || ''} text-xs ml-2">(${psLabels[ps] || ps})</span></div>`;
         const discountLine = order.discount_amount > 0 ? `<div class="flex justify-between text-sm text-green-600"><span>Скидка (${order.promo_code})</span><span>-${parseFloat(order.discount_amount).toFixed(0)} ₽</span></div>` : '';
         const deliveryFeeLine = order.delivery_fee > 0 ? `<div class="flex justify-between text-sm text-stone-500"><span>Доставка</span><span>+${parseFloat(order.delivery_fee).toFixed(0)} ₽</span></div>` : '';
 
@@ -1127,6 +1169,9 @@ async function loadSettings() {
         document.getElementById('legal-inn').value = s.legal_inn || '';
         document.getElementById('legal-ogrn').value = s.legal_ogrn || '';
         document.getElementById('legal-address').value = s.legal_address || '';
+        document.getElementById('payment-online-enabled').checked = s.payment_online_enabled == 1 || s.payment_online_enabled === true;
+        document.getElementById('yookassa-shop-id').value = s.yookassa_shop_id || '';
+        document.getElementById('yookassa-secret-key').value = s.yookassa_secret_key || '';
     } catch(e) { console.error('Settings error:', e); }
 }
 
@@ -1140,7 +1185,10 @@ async function saveSettings() {
         legal_name: document.getElementById('legal-name').value,
         legal_inn: document.getElementById('legal-inn').value,
         legal_ogrn: document.getElementById('legal-ogrn').value,
-        legal_address: document.getElementById('legal-address').value
+        legal_address: document.getElementById('legal-address').value,
+        payment_online_enabled: document.getElementById('payment-online-enabled').checked ? '1' : '0',
+        yookassa_shop_id: document.getElementById('yookassa-shop-id').value,
+        yookassa_secret_key: document.getElementById('yookassa-secret-key').value
     };
     const newPwd = document.getElementById('new-password').value;
     if (newPwd) body.new_password = newPwd;

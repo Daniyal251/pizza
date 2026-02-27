@@ -48,6 +48,8 @@ try {
         status ENUM('new','cooking','ready','delivering','done','canceled') DEFAULT 'new',
         notes TEXT,
         payment_method VARCHAR(30) DEFAULT 'cash',
+        payment_status ENUM('pending','paid','failed','refunded') DEFAULT 'pending',
+        payment_id VARCHAR(100),
         telegram_sent TINYINT(1) DEFAULT 0,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -114,6 +116,9 @@ try {
         ['legal_inn', ''],
         ['legal_ogrn', ''],
         ['legal_address', ''],
+        ['payment_online_enabled', '0'],
+        ['yookassa_shop_id', ''],
+        ['yookassa_secret_key', ''],
     ];
     $stmtS = $db->prepare("INSERT IGNORE INTO settings (setting_key, setting_value) VALUES (?, ?)");
     foreach ($settingsData as $row) {

@@ -37,6 +37,9 @@ if ($method === 'POST') {
         'legal_inn',
         'legal_ogrn',
         'legal_address',
+        'payment_online_enabled',
+        'yookassa_shop_id',
+        'yookassa_secret_key',
     ];
 
     $db->beginTransaction();

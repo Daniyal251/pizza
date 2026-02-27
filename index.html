@@ -210,8 +210,13 @@
                 <!-- Способ оплаты -->
                 <div>
                     <label class="block text-sm font-medium text-stone-700 mb-1">Способ оплаты</label>
-                    <div class="flex items-center px-4 py-3 border-2 border-stone-900 bg-stone-900 text-white rounded-xl text-sm font-medium">
-                        <i data-lucide="banknote" class="w-4 h-4 mr-2"></i>Наличные при получении
+                    <div id="payment-methods" class="grid grid-cols-2 gap-2">
+                        <button type="button" onclick="setPaymentMethod('cash')" id="pm-cash" class="flex items-center justify-center px-4 py-3 border-2 border-stone-900 bg-stone-900 text-white rounded-xl font-medium text-sm transition-colors">
+                            <i data-lucide="banknote" class="w-4 h-4 mr-2"></i>Наличные
+                        </button>
+                        <button type="button" onclick="setPaymentMethod('card')" id="pm-card" class="flex items-center justify-center px-4 py-3 border-2 border-stone-200 bg-white text-stone-600 rounded-xl font-medium text-sm transition-colors hidden">
+                            <i data-lucide="credit-card" class="w-4 h-4 mr-2"></i>Картой
+                        </button>
                     </div>
                 </div>
                 <!-- Order summary -->
@@ -252,6 +257,8 @@ let cart = [];
 let isCartOpen = false;
 let deliveryConfig = { delivery_enabled: false, pickup_address: '', min_order_amount: 0, zones: [] };
 let selectedDeliveryType = 'pickup';
+let selectedPaymentMethod = 'cash';
+let onlinePaymentEnabled = false;
 let appliedPromo = null;
 
 // ============================================================
@@ -320,6 +327,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (l.legal_inn) text += ' | ИНН: ' + l.legal_inn;
             if (l.legal_ogrn) text += ' | ' + (l.legal_business_type === 'ip' ? 'ОГРНИП' : 'ОГРН') + ': ' + l.legal_ogrn;
             document.getElementById('footer-legal').textContent = text.trim();
+        }
+    } catch(e) {}
+
+    // Load payment config
+    try {
+        const payConfig = await apiFetch('payment.php?action=config');
+        onlinePaymentEnabled = payConfig.online_payment_enabled === true;
+        if (onlinePaymentEnabled) {
+            document.getElementById('pm-card').classList.remove('hidden');
         }
     } catch(e) {}
 });
@@ -512,6 +528,17 @@ async function applyPromo() {
 // ============================================================
 // CHECKOUT
 // ============================================================
+function setPaymentMethod(method) {
+    selectedPaymentMethod = method;
+    const cashBtn = document.getElementById('pm-cash');
+    const cardBtn = document.getElementById('pm-card');
+    const active = 'flex items-center justify-center px-4 py-3 border-2 border-stone-900 bg-stone-900 text-white rounded-xl font-medium text-sm transition-colors';
+    const inactive = 'flex items-center justify-center px-4 py-3 border-2 border-stone-200 bg-white text-stone-600 rounded-xl font-medium text-sm transition-colors';
+    cashBtn.className = method === 'cash' ? active : inactive;
+    if (cardBtn) cardBtn.className = method === 'card' ? active : inactive;
+    updateCheckoutSummary();
+}
+
 function setDeliveryType(type) {
     selectedDeliveryType = type;
     const pickupBtn = document.getElementById('dt-pickup');
@@ -620,7 +647,7 @@ async function submitOrder(e) {
         customer_name: document.getElementById('order-name').value,
         customer_phone: document.getElementById('order-phone').value,
         delivery_type: selectedDeliveryType,
-        payment_method: 'cash',
+        payment_method: selectedPaymentMethod,
         items: cart.map(i => ({ menu_item_id: i.id, quantity: i.qty }))
     };
 
@@ -636,9 +663,24 @@ async function submitOrder(e) {
         closeCheckoutModal();
         cart = [];
         appliedPromo = null;
+        selectedPaymentMethod = 'cash';
         updateCartUI();
         document.getElementById('promo-input').value = '';
         document.getElementById('promo-status').classList.add('hidden');
+
+        // Если оплата картой — перенаправить на страницу оплаты
+        if (orderData.payment_method === 'card' && result.order_number) {
+            try {
+                const payResult = await apiPost('payment.php?action=create', { order_number: result.order_number });
+                if (payResult.payment_url) {
+                    window.location.href = payResult.payment_url;
+                    return;
+                }
+            } catch(payErr) {
+                // Оплата не прошла — показываем заказ как принятый, оплата при получении
+                console.error('Payment creation failed:', payErr);
+            }
+        }
 
         const orderNum = result.order_number || '';
         document.getElementById('success-order-number').innerHTML = orderNum
