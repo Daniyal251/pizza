@@ -7,8 +7,6 @@ require_once __DIR__ . '/db.php';
 $db = getDB();
 
 try {
-    $db->beginTransaction();
-
     // --- Таблицы ---
 
     $db->exec("CREATE TABLE IF NOT EXISTS categories (
@@ -160,8 +158,6 @@ try {
     $dzStmt->execute([2, '3-7 км', 200, 800]);
     $dzStmt->execute([3, '7-15 км', 350, 1000]);
 
-    $db->commit();
-
     jsonResponse([
         'success' => true,
         'message' => 'База данных успешно создана и заполнена! Удалите файл install.php.',
@@ -169,6 +165,5 @@ try {
     ]);
 
 } catch (Exception $e) {
-    $db->rollBack();
-    jsonError('Ошибка установки: ' . $e->getMessage(), 500);
+    jsonError('Ошибка установки', 500, $e->getMessage());
 }
