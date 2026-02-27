@@ -7,8 +7,6 @@ require_once __DIR__ . '/db.php';
 $db = getDB();
 
 try {
-    $db->beginTransaction();
-
     // --- Таблицы ---
 
     $db->exec("CREATE TABLE IF NOT EXISTS categories (
@@ -49,6 +47,9 @@ try {
         total DECIMAL(10,2) NOT NULL,
         status ENUM('new','cooking','ready','delivering','done','canceled') DEFAULT 'new',
         notes TEXT,
+        payment_method VARCHAR(30) DEFAULT 'cash',
+        payment_status ENUM('pending','paid','failed','refunded') DEFAULT 'pending',
+        payment_id VARCHAR(100),
         telegram_sent TINYINT(1) DEFAULT 0,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -110,6 +111,14 @@ try {
         ['working_hours', '10:00-21:00'],
         ['min_order_amount', '0'],
         ['restaurant_phone', '8 (929) 725-24-55'],
+        ['legal_business_type', ''],
+        ['legal_name', ''],
+        ['legal_inn', ''],
+        ['legal_ogrn', ''],
+        ['legal_address', ''],
+        ['payment_online_enabled', '0'],
+        ['yookassa_shop_id', ''],
+        ['yookassa_secret_key', ''],
     ];
     $stmtS = $db->prepare("INSERT IGNORE INTO settings (setting_key, setting_value) VALUES (?, ?)");
     foreach ($settingsData as $row) {
@@ -160,8 +169,6 @@ try {
     $dzStmt->execute([2, '3-7 км', 200, 800]);
     $dzStmt->execute([3, '7-15 км', 350, 1000]);
 
-    $db->commit();
-
     jsonResponse([
         'success' => true,
         'message' => 'База данных успешно создана и заполнена! Удалите файл install.php.',
@@ -169,6 +176,5 @@ try {
     ]);
 
 } catch (Exception $e) {
-    $db->rollBack();
-    jsonError('Ошибка установки: ' . $e->getMessage(), 500);
+    jsonError('Ошибка установки', 500, $e->getMessage());
 }

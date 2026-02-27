@@ -93,6 +93,8 @@ if ($method === 'POST') {
     if (empty($input['items']) || !is_array($input['items'])) jsonError('Корзина пуста');
 
     $deliveryType = in_array($input['delivery_type'] ?? '', ['pickup', 'delivery']) ? $input['delivery_type'] : 'pickup';
+    $paymentMethod = in_array($input['payment_method'] ?? '', ['cash', 'card']) ? $input['payment_method'] : 'cash';
+    $paymentStatus = ($paymentMethod === 'cash') ? 'paid' : 'pending';
     $deliveryAddress = '';
     if ($deliveryType === 'delivery') {
         $deliveryAddress = htmlspecialchars(trim($input['delivery_address'] ?? ''));
@@ -178,8 +180,8 @@ if ($method === 'POST') {
     try {
         $stmt = $db->prepare("
             INSERT INTO orders (order_number, customer_name, customer_phone, delivery_type, delivery_address,
-                promo_code, discount_amount, subtotal, delivery_fee, total, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'new')
+                promo_code, discount_amount, subtotal, delivery_fee, total, payment_method, payment_status, status)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'new')
         ");
         $stmt->execute([
             $orderNumber,
@@ -191,7 +193,9 @@ if ($method === 'POST') {
             $discount,
             $subtotal,
             $deliveryFee,
-            $total
+            $total,
+            $paymentMethod,
+            $paymentStatus
         ]);
         $orderId = (int)$db->lastInsertId();
 

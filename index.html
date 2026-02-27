@@ -133,8 +133,15 @@
         </div>
     </section>
 
-    <footer class="bg-stone-950 text-stone-500 py-8 text-center text-sm">
-        &copy; <span id="year"></span> You ПЕЧКА. Все права защищены.
+    <footer class="bg-stone-950 text-stone-500 py-8 text-sm">
+        <div class="max-w-6xl mx-auto px-4 space-y-3">
+            <div class="flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-6">
+                <a href="privacy.html" target="_blank" class="hover:text-stone-300 underline transition-colors">Политика конфиденциальности</a>
+                <a href="offer.html" target="_blank" class="hover:text-stone-300 underline transition-colors">Публичная оферта</a>
+            </div>
+            <p id="footer-legal" class="text-center text-stone-600 text-xs"></p>
+            <p class="text-center">&copy; <span id="year"></span> You ПЕЧКА. Все права защищены.</p>
+        </div>
     </footer>
 
     <!-- Cart Sidebar -->
@@ -200,9 +207,28 @@
                     <input type="text" id="order-address" class="w-full px-4 py-3 border border-stone-200 rounded-xl focus:ring-2 focus:ring-orange-500 outline-none" placeholder="Улица, дом, квартира">
                     <div id="delivery-zone-info" class="text-xs text-stone-500 mt-1"></div>
                 </div>
+                <!-- Способ оплаты -->
+                <div>
+                    <label class="block text-sm font-medium text-stone-700 mb-1">Способ оплаты</label>
+                    <div id="payment-methods" class="grid grid-cols-2 gap-2">
+                        <button type="button" onclick="setPaymentMethod('cash')" id="pm-cash" class="flex items-center justify-center px-4 py-3 border-2 border-stone-900 bg-stone-900 text-white rounded-xl font-medium text-sm transition-colors">
+                            <i data-lucide="banknote" class="w-4 h-4 mr-2"></i>Наличные
+                        </button>
+                        <button type="button" onclick="setPaymentMethod('card')" id="pm-card" class="flex items-center justify-center px-4 py-3 border-2 border-stone-200 bg-white text-stone-600 rounded-xl font-medium text-sm transition-colors hidden">
+                            <i data-lucide="credit-card" class="w-4 h-4 mr-2"></i>Картой
+                        </button>
+                    </div>
+                </div>
                 <!-- Order summary -->
                 <div id="checkout-summary" class="bg-stone-50 rounded-xl p-4 border border-stone-100 space-y-2 text-sm"></div>
-                <button id="submit-btn" type="submit" class="w-full mt-2 bg-stone-900 hover:bg-stone-800 text-white font-bold py-4 rounded-xl flex items-center justify-center transition-colors">
+                <!-- Согласие на обработку данных (152-ФЗ) -->
+                <div class="flex items-start gap-3">
+                    <input type="checkbox" id="consent-checkbox" onchange="toggleSubmitBtn()" class="mt-1 w-4 h-4 rounded border-stone-300 text-orange-600 focus:ring-orange-500 cursor-pointer flex-shrink-0">
+                    <label for="consent-checkbox" class="text-xs text-stone-500 leading-relaxed cursor-pointer">
+                        Оформляя заказ, я соглашаюсь с <a href="privacy.html" target="_blank" class="text-orange-600 underline hover:text-orange-500">политикой конфиденциальности</a> и условиями <a href="offer.html" target="_blank" class="text-orange-600 underline hover:text-orange-500">публичной оферты</a>
+                    </label>
+                </div>
+                <button id="submit-btn" type="submit" disabled class="w-full mt-2 bg-stone-400 text-white font-bold py-4 rounded-xl flex items-center justify-center transition-colors cursor-not-allowed">
                     <i data-lucide="send" class="w-5 h-5 mr-2"></i> Отправить заказ
                 </button>
             </form>
@@ -231,6 +257,8 @@ let cart = [];
 let isCartOpen = false;
 let deliveryConfig = { delivery_enabled: false, pickup_address: '', min_order_amount: 0, zones: [] };
 let selectedDeliveryType = 'pickup';
+let selectedPaymentMethod = 'cash';
+let onlinePaymentEnabled = false;
 let appliedPromo = null;
 
 // ============================================================
@@ -289,9 +317,26 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     } catch(e) { console.error('Delivery config error:', e); }
 
-    // Load settings for contacts
+    // Load legal info for footer
     try {
-        // We can't access admin settings API without auth, so we use delivery config
+        const legalData = await apiFetch('legal.php');
+        const l = legalData.legal || {};
+        const typeLabels = { ip: 'ИП', ooo: 'ООО', self: 'Самозанятый' };
+        if (l.legal_name) {
+            let text = (typeLabels[l.legal_business_type] || '') + ' ' + l.legal_name;
+            if (l.legal_inn) text += ' | ИНН: ' + l.legal_inn;
+            if (l.legal_ogrn) text += ' | ' + (l.legal_business_type === 'ip' ? 'ОГРНИП' : 'ОГРН') + ': ' + l.legal_ogrn;
+            document.getElementById('footer-legal').textContent = text.trim();
+        }
+    } catch(e) {}
+
+    // Load payment config
+    try {
+        const payConfig = await apiFetch('payment.php?action=config');
+        onlinePaymentEnabled = payConfig.online_payment_enabled === true;
+        if (onlinePaymentEnabled) {
+            document.getElementById('pm-card').classList.remove('hidden');
+        }
     } catch(e) {}
 });
 
@@ -483,6 +528,17 @@ async function applyPromo() {
 // ============================================================
 // CHECKOUT
 // ============================================================
+function setPaymentMethod(method) {
+    selectedPaymentMethod = method;
+    const cashBtn = document.getElementById('pm-cash');
+    const cardBtn = document.getElementById('pm-card');
+    const active = 'flex items-center justify-center px-4 py-3 border-2 border-stone-900 bg-stone-900 text-white rounded-xl font-medium text-sm transition-colors';
+    const inactive = 'flex items-center justify-center px-4 py-3 border-2 border-stone-200 bg-white text-stone-600 rounded-xl font-medium text-sm transition-colors';
+    cashBtn.className = method === 'cash' ? active : inactive;
+    if (cardBtn) cardBtn.className = method === 'card' ? active : inactive;
+    updateCheckoutSummary();
+}
+
 function setDeliveryType(type) {
     selectedDeliveryType = type;
     const pickupBtn = document.getElementById('dt-pickup');
@@ -559,6 +615,19 @@ function updateCheckoutSummary() {
     document.getElementById('checkout-summary').innerHTML = html;
 }
 
+function toggleSubmitBtn() {
+    const btn = document.getElementById('submit-btn');
+    const checked = document.getElementById('consent-checkbox').checked;
+    if (checked) {
+        btn.disabled = false;
+        btn.className = 'w-full mt-2 bg-stone-900 hover:bg-stone-800 text-white font-bold py-4 rounded-xl flex items-center justify-center transition-colors';
+        btn.style.cursor = '';
+    } else {
+        btn.disabled = true;
+        btn.className = 'w-full mt-2 bg-stone-400 text-white font-bold py-4 rounded-xl flex items-center justify-center transition-colors cursor-not-allowed';
+    }
+}
+
 async function submitOrder(e) {
     e.preventDefault();
     const btn = document.getElementById('submit-btn');
@@ -566,10 +635,19 @@ async function submitOrder(e) {
     btn.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 mr-2 animate-spin"></i> Отправка...`;
     lucide.createIcons();
 
+    if (!document.getElementById('consent-checkbox').checked) {
+        alert('Необходимо согласиться с политикой конфиденциальности и условиями оферты');
+        btn.disabled = false;
+        btn.innerHTML = `<i data-lucide="send" class="w-5 h-5 mr-2"></i> Отправить заказ`;
+        lucide.createIcons();
+        return;
+    }
+
     const orderData = {
         customer_name: document.getElementById('order-name').value,
         customer_phone: document.getElementById('order-phone').value,
         delivery_type: selectedDeliveryType,
+        payment_method: selectedPaymentMethod,
         items: cart.map(i => ({ menu_item_id: i.id, quantity: i.qty }))
     };
 
@@ -585,9 +663,24 @@ async function submitOrder(e) {
         closeCheckoutModal();
         cart = [];
         appliedPromo = null;
+        selectedPaymentMethod = 'cash';
         updateCartUI();
         document.getElementById('promo-input').value = '';
         document.getElementById('promo-status').classList.add('hidden');
+
+        // Если оплата картой — перенаправить на страницу оплаты
+        if (orderData.payment_method === 'card' && result.order_number) {
+            try {
+                const payResult = await apiPost('payment.php?action=create', { order_number: result.order_number });
+                if (payResult.payment_url) {
+                    window.location.href = payResult.payment_url;
+                    return;
+                }
+            } catch(payErr) {
+                // Оплата не прошла — показываем заказ как принятый, оплата при получении
+                console.error('Payment creation failed:', payErr);
+            }
+        }
 
         const orderNum = result.order_number || '';
         document.getElementById('success-order-number').innerHTML = orderNum
