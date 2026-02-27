@@ -32,6 +32,11 @@ if ($method === 'POST') {
         'working_hours',
         'min_order_amount',
         'restaurant_phone',
+        'legal_business_type',
+        'legal_name',
+        'legal_inn',
+        'legal_ogrn',
+        'legal_address',
     ];
 
     $db->beginTransaction();

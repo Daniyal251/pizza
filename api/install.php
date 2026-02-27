@@ -47,6 +47,7 @@ try {
         total DECIMAL(10,2) NOT NULL,
         status ENUM('new','cooking','ready','delivering','done','canceled') DEFAULT 'new',
         notes TEXT,
+        payment_method VARCHAR(30) DEFAULT 'cash',
         telegram_sent TINYINT(1) DEFAULT 0,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -108,6 +109,11 @@ try {
         ['working_hours', '10:00-21:00'],
         ['min_order_amount', '0'],
         ['restaurant_phone', '8 (929) 725-24-55'],
+        ['legal_business_type', ''],
+        ['legal_name', ''],
+        ['legal_inn', ''],
+        ['legal_ogrn', ''],
+        ['legal_address', ''],
     ];
     $stmtS = $db->prepare("INSERT IGNORE INTO settings (setting_key, setting_value) VALUES (?, ?)");
     foreach ($settingsData as $row) {
